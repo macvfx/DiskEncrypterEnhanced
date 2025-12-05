@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Label</key>
+	<string>com.custom.diskencrypter.volumewatcher</string>
+
+	<key>ProgramArguments</key>
+	<array>
+		<string>/Library/Application Support/Custom/DiskEncrypter_Enhanced.sh</string>
+	</array>
+
+	<!-- Watch the /Volumes directory for new mounts -->
+	<key>WatchPaths</key>
+	<array>
+		<string>/Volumes</string>
+	</array>
+
+	<!-- Run at system boot -->
+	<key>RunAtLoad</key>
+	<true/>
+
+	<!-- Throttle interval: wait 5 seconds between runs to avoid rapid re-triggering -->
+	<key>ThrottleInterval</key>
+	<integer>5</integer>
+
+	<!-- Run as root (required for disk operations) -->
+	<key>UserName</key>
+	<string>root</string>
+
+	<!-- Logging paths for debugging -->
+	<key>StandardOutPath</key>
+	<string>/var/log/diskencrypter.log</string>
+
+	<key>StandardErrorPath</key>
+	<string>/var/log/diskencrypter_error.log</string>
+
+	<!-- Process type (Adaptive is good for scripts) -->
+	<key>ProcessType</key>
+	<string>Adaptive</string>
+
+	<!-- Nice level (lower priority so it doesn't interfere with system) -->
+	<key>Nice</key>
+	<integer>10</integer>
+
+	<!-- Environment variables -->
+	<key>EnvironmentVariables</key>
+	<dict>
+		<key>PATH</key>
+		<string>/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+	</dict>
+</dict>
+</plist>

@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!-- DRY RUN MODE: Set to "yes" to test without making changes, "no" for production -->
+	<key>dryRun</key>
+	<string>no</string>
+
+	<!-- LOG LEVEL: 0=minimal, 1=normal, 2=verbose, 3=debug -->
+	<key>logLevel</key>
+	<integer>1</integer>
+
+	<!-- USER NOTIFICATION SETTINGS -->
+	<key>notifyUser</key>
+	<string>yes</string>
+
+	<key>notifyUserHint</key>
+	<string>yes</string>
+
+	<key>downloadSwiftDialog</key>
+	<string>yes</string>
+
+	<key>notificationApp</key>
+	<string>/usr/local/bin/dialog</string>
+
+	<!-- BRANDING -->
+	<key>companyName</key>
+	<string>Jamf</string>
+
+	<key>iconPath</key>
+	<string>/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/FileVaultIcon.icns</string>
+
+	<key>batteryIconPath</key>
+	<string>/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/AlertStopIcon.icns</string>
+
+	<!-- DIALOG TEXT -->
+	<key>title</key>
+	<string>Unencrypted Removable Media Device detected</string>
+
+	<key>subTitleBattery</key>
+	<string>The Mac is not connected to AC Power and therefore the removable media device can't be encrypted, plug in the AC adapter and try again</string>
+
+	<key>batteryExitMainButton</key>
+	<string>Quit</string>
+
+	<key>subTitlePassword</key>
+	<string>Writing files to unencrypted removable media devices is not allowed, encrypt the disk in order to allow writing files. securely store the password and in case of loss the data will be unaccesible!</string>
+
+	<key>mainButtonLabelPassword</key>
+	<string>Continue</string>
+
+	<key>subTitleConversion</key>
+	<string>Writing files to unencrypted removable media devices is not allowed, encrypt the disk in order to allow writing files. we need to convert this volume to APFS before encryption. Securely store the password and in case of loss the data will be unaccesible!</string>
+
+	<key>mainButtonLabelConversion</key>
+	<string>Convert</string>
+
+	<key>subTitleEXFAT</key>
+	<string>Writing files to unencrypted removable media devices is not allowed, encrypt the disk in order to allow writing files. As this volume type does not support conversion or encryption we need to erase the volume. all existing content will be erased!!!. Securely store the password and in case of loss the data will be unaccesible!</string>
+
+	<key>mainButtonLabelEXFAT</key>
+	<string>Erase existing data and encrypt</string>
+
+	<key>exitButtonLabel</key>
+	<string>Eject</string>
+
+	<!-- PASSWORD SETTINGS -->
+	<key>secondTitlePassword</key>
+	<string>Enter the password you want to use to encrypt the removable media</string>
+
+	<key>placeholderPassword</key>
+	<string>Enter password here</string>
+
+	<key>secondaryButtonLabelPassword</key>
+	<string>Mount as read-only</string>
+
+	<key>passwordRegex</key>
+	<string>^[^\s]{4,}$</string>
+
+	<key>passwordRegexErrorMessage</key>
+	<string>The provided password does not meet the requirements, please use at leasts 4 characters</string>
+
+	<!-- HINT SETTINGS -->
+	<key>subTitleHint</key>
+	<string>Optionally you can specify a hint, a password hint is a sort of reminder that helps the user remember their password.</string>
+
+	<key>mainButtonLabelHint</key>
+	<string>Encrypt</string>
+
+	<key>secondaryButtonLabelHint</key>
+	<string>Encrypt w/o hint</string>
+
+	<key>secondTitleHint</key>
+	<string>Enter the hint you want to set</string>
+
+	<key>placeholderHint</key>
+	<string>Enter hint here</string>
+
+	<key>hintRegex</key>
+	<string>^[^\s]{6,}$</string>
+
+	<key>hintRegexErrorMessage</key>
+	<string>The provided hint does not meet the requirements, please use a stronger hint that contains 6 characters</string>
+
+	<!-- PROGRESS DIALOG -->
+	<key>titleProgress</key>
+	<string>Disk Encryption Progress</string>
+
+	<key>subTitleProgress</key>
+	<string>Please wait while the external disk is being encrypted.</string>
+
+	<key>mainButtonLabelProgress</key>
+	<string>Exit</string>
+</dict>
+</plist>
