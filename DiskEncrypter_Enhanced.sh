@@ -6,6 +6,9 @@
 # Enhanced with comprehensive logging and dry-run mode
 # v2.2 - 12/04/2025 - Fixed read-only mount re-prompt issue (corrected field name from "Read-Only Volume" to "Volume Read-Only")
 #                   - Added NTFS volume support alongside ExFAT/FAT volumes
+# v2.3 - 12/09/2025 - Auto-mount unencrypted disks as read-only before prompting user
+#                   - Updated dialog options: "Keep Read-Only", "Eject", "Encrypt"
+#                   - Improved user workflow with safer default (read-only mount)
 
 ## Managed Preferences
 settingsPlist="/Library/Managed Preferences/com.custom.diskencrypter.plist"
@@ -241,18 +244,18 @@ readSettingsFile(){
     title=$( readSetting title "Unencrypted Removable Media Device detected" )
     subTitleBattery=$( readSetting subTitleBattery "The Mac is not connected to AC Power and therefore the removable media device can't be encrypted, plug in the AC adapter and try again")
     batteryExitMainButton=$( readSetting batteryExitMainButton "Quit" )
-    subTitlePassword=$( readSetting subTitlePassword "Writing files to unencrypted removable media devices is not allowed, encrypt the disk in order to allow writing files. securely store the password and in case of loss the data will be unaccesible!" )
-    mainButtonLabelPassword=$( readSetting mainButtonLabelPassword "Continue" )
-    subTitleConversion=$( readSetting subTitleConversion "Writing files to unencrypted removable media devices is not allowed, encrypt the disk in order to allow writing files. we need to convert this volume to APFS before encryption. Securely store the password and in case of loss the data will be unaccesible!" )
-    mainButtonLabelConversion=$( readSetting mainButtonLabelConversion "Convert" )
-    subTitleEXFAT=$( readSetting subTitleEXFAT "Writing files to unencrypted removable media devices is not allowed, encrypt the disk in order to allow writing files. As this volume type does not support conversion or encryption we need to erase the volume. all existing content will be erased!!!. Securely store the password and in case of loss the data will be unaccesible!" )
-    mainButtonLabelEXFAT=$( readSetting mainButtonLabelEXFAT "Erase existing data and encrypt" )
+    subTitlePassword=$( readSetting subTitlePassword "This volume has been mounted as read-only for your protection. To write files, you must encrypt the disk. Securely store the password - if lost, the data will be inaccessible!" )
+    mainButtonLabelPassword=$( readSetting mainButtonLabelPassword "Encrypt" )
+    subTitleConversion=$( readSetting subTitleConversion "This volume has been mounted as read-only for your protection. To write files, you must encrypt the disk. This volume will be converted to APFS before encryption. Securely store the password - if lost, the data will be inaccessible!" )
+    mainButtonLabelConversion=$( readSetting mainButtonLabelConversion "Encrypt" )
+    subTitleEXFAT=$( readSetting subTitleEXFAT "This volume has been mounted as read-only for your protection. To write files, you must encrypt the disk. WARNING: This volume type requires erasure - ALL EXISTING DATA WILL BE LOST! Securely store the password - if lost, the data will be inaccessible!" )
+    mainButtonLabelEXFAT=$( readSetting mainButtonLabelEXFAT "Erase and Encrypt" )
     exitButtonLabel=$( readSetting exitButtonLabel "Eject" )
 
     ## Password text and REGEX requirements
     secondTitlePassword=$( readSetting secondTitlePassword "Enter the password you want to use to encrypt the removable media" )
     placeholderPassword=$( readSetting placeholderPassword "Enter password here" )
-    secondaryButtonLabelPassword=$( readSetting secondaryButtonLabelPassword "Mount as read-only" )
+    secondaryButtonLabelPassword=$( readSetting secondaryButtonLabelPassword "Keep Read-Only" )
     passwordRegex=$( readSetting passwordRegex "^[^\s]{4,}$" )
     passwordRegexErrorMessage=$( readSetting passwordRegexErrorMessage "The provided password does not meet the requirements, please use at leasts 4 characters" )
 
@@ -375,6 +378,33 @@ checkACPower() {
 ###########################################
 ############ DISK OPERATIONS ##############
 ###########################################
+
+mountReadOnly() {
+    local VolumeID=$1
+    local volumeName=$2
+
+    log_info "Auto-mounting volume as read-only: $VolumeID ($volumeName)"
+
+    # Unmount first
+    log_operation "diskutil unmountDisk" "$VolumeID"
+    if [[ "$DRY_RUN" != "yes" ]]; then
+        diskutil unmountDisk "$VolumeID" 2>/dev/null
+    fi
+
+    # Mount as read-only
+    log_operation "diskutil mount readOnly" "$VolumeID"
+    if [[ "$DRY_RUN" != "yes" ]]; then
+        if diskutil mount readOnly "$VolumeID"; then
+            log_info "Successfully mounted $VolumeID ($volumeName) as read-only"
+            return 0
+        else
+            log_error "Failed to mount $VolumeID as read-only"
+            return 1
+        fi
+    fi
+
+    return 0
+}
 
 processAPFSDisk() {
     local DiskID=$1
@@ -529,12 +559,8 @@ processAPFSDisk() {
         fi
         ;;
         2)
-        log_info "$loggedInUser decided to mount $DiskID as read-only"
-        log_operation "diskutil unmountDisk" "$DiskID"
-        [[ "$DRY_RUN" != "yes" ]] && diskutil unmountDisk "$DiskID" 2>/dev/null
-
-        log_operation "diskutil mount readOnly" "$VolumeID"
-        [[ "$DRY_RUN" != "yes" ]] && diskutil mount readOnly "$VolumeID"
+        log_info "$loggedInUser decided to keep $DiskID mounted as read-only"
+        # Volume is already mounted read-only from discovery phase
         return 2
         ;;
         3)
@@ -702,12 +728,8 @@ processHFSDisk() {
         fi
         ;;
         2)
-        log_info "$loggedInUser decided to mount $DiskID as read-only"
-        log_operation "diskutil unmountDisk" "$DiskID"
-        [[ "$DRY_RUN" != "yes" ]] && diskutil unmountDisk "$DiskID" 2>/dev/null
-
-        log_operation "diskutil mount readOnly" "$VolumeID"
-        [[ "$DRY_RUN" != "yes" ]] && diskutil mount readOnly "$VolumeID"
+        log_info "$loggedInUser decided to keep $DiskID mounted as read-only"
+        # Volume is already mounted read-only from discovery phase
         return 2
         ;;
         3)
@@ -880,12 +902,8 @@ processExFATDisk() {
         fi
         ;;
         2)
-        log_info "$loggedInUser decided to mount $DiskID as read-only"
-        log_operation "diskutil unmountDisk" "$DiskID"
-        [[ "$DRY_RUN" != "yes" ]] && diskutil unmountDisk "$DiskID" 2>/dev/null
-
-        log_operation "diskutil mount readOnly" "$VolumeID"
-        [[ "$DRY_RUN" != "yes" ]] && diskutil mount readOnly "$VolumeID"
+        log_info "$loggedInUser decided to keep $DiskID mounted as read-only"
+        # Volume is already mounted read-only from discovery phase
         return 2
         ;;
         3)
@@ -971,7 +989,7 @@ main() {
 
     log_info "========================================="
     log_info "DiskEncrypter Script Starting"
-    log_info "Version: 2.0 Enhanced (Dry-Run Capable)"
+    log_info "Version: 2.3 (Auto Read-Only Mount)"
     log_info "========================================="
     log_info "DRY RUN MODE: $DRY_RUN (source: $dryRunSource)"
     log_info "LOG LEVEL: $LOG_LEVEL (source: $logLevelSource)"
@@ -997,16 +1015,56 @@ main() {
     checkFullDiskAccess
     readSettingsFile
 
-    log_verbose "Scanning for external disks"
+    log_verbose "Scanning for removable disks (external and internal SD cards)"
+
+    # Get external physical drives
     ExternalDisks=$(diskutil list external physical | grep "/dev/disk" | awk '{print $1}')
 
-    if [[ -z $ExternalDisks ]]; then
-        log_info "No external disks mounted"
+    # Get internal physical drives (for SD card slots)
+    InternalDisks=$(diskutil list internal physical | grep "/dev/disk" | awk '{print $1}')
+
+    # Filter internal disks to only include removable media (SD cards, etc.)
+    # Exclude the main system disk by checking if it's the boot disk
+    RemovableInternalDisks=""
+    if [[ -n "$InternalDisks" ]]; then
+        while IFS= read -r disk; do
+            [[ -z "$disk" ]] && continue
+
+            # Check if this is removable media (not the system disk)
+            diskInfo=$(diskutil info "$disk" 2>/dev/null)
+            isRemovable=$(echo "$diskInfo" | grep "Removable Media:" | awk '{print $3}')
+            isInternal=$(echo "$diskInfo" | grep "Device Location:" | grep "Internal")
+
+            # Include if it's marked as removable OR if it's an SD card reader
+            if [[ "$isRemovable" == "Removable" ]] || echo "$diskInfo" | grep -q "SD Card"; then
+                log_debug "Found removable internal disk: $disk"
+                if [[ -z "$RemovableInternalDisks" ]]; then
+                    RemovableInternalDisks="$disk"
+                else
+                    RemovableInternalDisks="$RemovableInternalDisks"$'\n'"$disk"
+                fi
+            fi
+        done <<< "$InternalDisks"
+    fi
+
+    # Combine external and removable internal disks
+    if [[ -n "$ExternalDisks" ]] && [[ -n "$RemovableInternalDisks" ]]; then
+        AllRemovableDisks="$ExternalDisks"$'\n'"$RemovableInternalDisks"
+    elif [[ -n "$ExternalDisks" ]]; then
+        AllRemovableDisks="$ExternalDisks"
+    elif [[ -n "$RemovableInternalDisks" ]]; then
+        AllRemovableDisks="$RemovableInternalDisks"
+    else
+        AllRemovableDisks=""
+    fi
+
+    if [[ -z $AllRemovableDisks ]]; then
+        log_info "No removable disks mounted"
         exit 0
     fi
 
-    diskCount=$(echo "$ExternalDisks" | wc -l | tr -d ' ')
-    log_info "Found $diskCount external disk(s)"
+    diskCount=$(echo "$AllRemovableDisks" | wc -l | tr -d ' ')
+    log_info "Found $diskCount removable disk(s)"
 
     # Array to store unencrypted volumes for processing
     declare -a UNENCRYPTED_QUEUE=()
@@ -1091,6 +1149,10 @@ main() {
                         # Found an unencrypted volume (FileVault: No)
                         if [[ "$volumeFileVaultLine" == "No" ]]; then
                             log_info "Found unencrypted APFS volume: $VolumeID ($volumeName)"
+
+                            # Auto-mount as read-only before adding to queue
+                            mountReadOnly "$VolumeID" "$volumeName"
+
                             UNENCRYPTED_QUEUE+=("APFS|$ContainerDiskID|$VolumeID|$volumeName")
                             volumeProcessed=true
                             foundPartitions=true
@@ -1142,6 +1204,10 @@ main() {
                 fi
 
                 log_info "Found unencrypted HFS+ volume: $VolumeID ($volumeName)"
+
+                # Auto-mount as read-only before adding to queue
+                mountReadOnly "$VolumeID" "$volumeName"
+
                 UNENCRYPTED_QUEUE+=("HFS|$DiskID|$VolumeID|$volumeName")
                 foundPartitions=true
 
@@ -1181,6 +1247,10 @@ main() {
                 fi
 
                 log_info "Found unencrypted ExFAT/FAT/NTFS volume: $VolumeID ($volumeName)"
+
+                # Auto-mount as read-only before adding to queue
+                mountReadOnly "$VolumeID" "$volumeName"
+
                 UNENCRYPTED_QUEUE+=("ExFAT|$DiskID|$VolumeID|$volumeName")
                 foundPartitions=true
 
@@ -1192,7 +1262,7 @@ main() {
             log_debug "Storage info: $StorageInfo"
         fi
 
-    done <<< "$ExternalDisks"
+    done <<< "$AllRemovableDisks"
 
     # Report discovery results
     log_info "========================================="
