@@ -1,9 +1,9 @@
 # DiskEncrypter Evolution Guide
 ## From DiskEncrypter.sh to DiskEncrypter_Enhanced.sh v2.3
 
-**Document Version:** 2.0
-**Date:** December 9, 2025
-**Author:** MacVFX
+- **Document Version:** 2.0
+- **Date:** December 9, 2025
+- **Author:** MacVFX
 
 ---
 
