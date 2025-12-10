@@ -242,9 +242,9 @@ tail -100 /var/log/diskencrypter_error.log
 
 ## License
 
-© 2022-2025 Thijs Xhaflaire
+© 2022 Thijs Xhaflaire
 
 ## Credits
 
-Created by: Thijs Xhaflaire
+Created by: Thijs Xhaflaire in 2022
 Enhanced: December 2025
