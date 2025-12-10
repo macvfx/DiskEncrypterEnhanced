@@ -21,7 +21,7 @@ This package contains all files needed to deploy the DiskEncrypter solution:
 
 ```
 DiskEncryption2.0/
-├── DiskEncrypter_Enhanced.sh                          # Main encryption script (v2.2)
+├── DiskEncrypter_Enhanced.sh                          # Main encryption script
 ├── com.custom.diskencrypter.volumewatcher.plist      # LaunchDaemon configuration
 ├── com.custom.diskencrypter.plist                    # Settings/preferences (example)
 ├── install_launchdaemon.sh                           # Installation script
