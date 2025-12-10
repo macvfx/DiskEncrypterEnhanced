@@ -1,9 +1,16 @@
 # DiskEncryption 2.0 Package
 
-**Version:** 2.2
-**Date:** December 4, 2025
+**Version:** 2.3
+**Date:** December 9, 2025
 **Compatibility:** macOS 15+ (Sequoia) and macOS 26+
 
+## What's New in v2.3
+
+- **Changed:** Auto-mount unencrypted disks as read-only before prompting user
+- Updated dialog options: "Keep Read-Only", "Eject", "Encrypt"
+- Improved user workflow with safer default (read-only mount)
+- Scans for Internal SD card slot volumes
+  
 ## What's New in v2.2
 
 - **Fixed:** Read-only mount re-prompt issue - volumes mounted as read-only or unmounted are now automatically skipped during scanning, preventing repeated prompts when new volumes appear
@@ -78,7 +85,7 @@ tail -f /var/log/diskencrypter_error.log
 
 ### User Options
 1. **Encrypt** - Convert and encrypt the volume with user-provided password
-2. **Mount Read-Only** - Mount the volume in read-only mode (choice is remembered)
+2. **Keep Read-Only** - Mount the volume in read-only mode (choice is remembered)
 3. **Eject** - Unmount and eject the volume
 
 ### Advanced Features
@@ -199,6 +206,13 @@ sudo /Library/Application\ Support/Custom/DiskEncrypter_Enhanced.sh --dry-run --
 - SwiftDialog (auto-downloaded if not present)
 
 ## Version History
+
+### v2.3 - December 9, 2025
+
+- **Changed:** Auto-mount unencrypted disks as read-only before prompting user
+- Updated dialog options: "Keep Read-Only", "Eject", "Encrypt"
+- Improved user workflow with safer default (read-only mount)
+- Scans for Internal SD card slot volumes
 
 ### v2.2 - December 4, 2025
 - Fixed read-only mount re-prompt issue
