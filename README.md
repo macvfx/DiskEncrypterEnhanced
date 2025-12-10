@@ -1,8 +1,8 @@
 # DiskEncryption 2.0 Package
 
-**Version:** 2.3
-**Date:** December 9, 2025
-**Compatibility:** macOS 15+ (Sequoia) and macOS 26+
+- **Version:** 2.3
+- **Date:** December 9, 2025
+- **Compatibility:** macOS 15+ (Sequoia) and macOS 26+
 
 ## What's New in v2.3
 
