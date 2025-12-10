@@ -74,9 +74,9 @@ tail -f /var/log/diskencrypter_error.log
 ## Key Features
 
 ### Automatic Encryption Enforcement
-- Automatically detects unencrypted external drives
-- Prompts users to encrypt or mount read-only
-- Supports APFS, HFS+, ExFAT/FAT volumes
+- Automatically detects unencrypted external drives and mounts as read-only **(v.2.3)**
+- Prompts users to encrypt, eject or keep mounted as read-only
+- Supports APFS, HFS+, ExFAT/FAT/NTFS volumes
 
 ### Smart Volume Handling (v2.2)
 - **Skips read-only volumes** - won't re-prompt for volumes already mounted read-only
@@ -84,8 +84,8 @@ tail -f /var/log/diskencrypter_error.log
 - **Prevents duplicate prompts** - when new volumes appear, previously handled volumes are automatically skipped
 
 ### User Options
-1. **Encrypt** - Convert and encrypt the volume with user-provided password
-2. **Keep Read-Only** - Mount the volume in read-only mode (choice is remembered)
+1. **Encrypt** - Convert and encrypt the volume with user-provided password (**Note:** exFAT, FAT and NTFS volumes will be erased. Make sure your data is backed up if you choose this option)
+2. **Keep Read-Only** - Keep the volume in read-only mode (all un-ecrypted volumes are automatically re-mounted as read-only)
 3. **Eject** - Unmount and eject the volume
 
 ### Advanced Features
