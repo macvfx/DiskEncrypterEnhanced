@@ -1,4 +1,4 @@
-# DiskEncryption 2.0 Package
+# DiskEncryption 2.0 "Enhanced"
 
 - **Version:** 2.3
 - **Date:** December 9, 2025
