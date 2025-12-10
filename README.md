@@ -85,7 +85,7 @@ tail -f /var/log/diskencrypter_error.log
 
 ### User Options
 1. **Encrypt** - Convert and encrypt the volume with user-provided password (**Note:** exFAT, FAT and NTFS volumes will be erased. Make sure your data is backed up if you choose this option)
-2. **Keep Read-Only** - Keep the volume in read-only mode (all un-ecrypted volumes are automatically re-mounted as read-only)
+2. **Keep Read-Only** - Keep the volume in read-only mode (all un-encrypted volumes are automatically re-mounted as read-only)
 3. **Eject** - Unmount and eject the volume
 
 ### Advanced Features
