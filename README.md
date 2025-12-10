@@ -4,6 +4,11 @@
 - **Date:** December 9, 2025
 - **Compatibility:** macOS 15+ (Sequoia) and macOS 26+
 
+## What's New in 2.4
+- **CHANGED:** Safer option. It does not offer to erase non-encryptable disks , only mount read only or eject
+- Instructions in dialog to erase disks after backin up data
+- Re-name script from "DiskEncrypter_Enhanced-NO-ERASE.sh" to "DiskEncrypter_Enhanced.sh" to use if installing manually
+
 ## What's New in v2.3
 
 - **Changed:** Auto-mount unencrypted disks as read-only before prompting user
@@ -73,6 +78,10 @@ tail -f /var/log/diskencrypter_error.log
 
 ## Key Features
 
+### Safer Handling of Unencrypted Volumes ###
+- in v.2.4.2 there is no erase option option
+- instructions for erasing after backups only
+  
 ### Automatic Encryption Enforcement
 - Automatically detects unencrypted external drives and mounts as read-only **(v.2.3)**
 - Prompts users to encrypt, eject or keep mounted as read-only
@@ -84,7 +93,7 @@ tail -f /var/log/diskencrypter_error.log
 - **Prevents duplicate prompts** - when new volumes appear, previously handled volumes are automatically skipped
 
 ### User Options
-1. **Encrypt** - Convert and encrypt the volume with user-provided password (**Note:** exFAT, FAT and NTFS volumes will be erased. Make sure your data is backed up if you choose this option)
+1. **Encrypt** - Convert and encrypt the volume with user-provided password (**Note:** in v2.3 exFAT, FAT and NTFS volumes will be erased. Make sure your data is backed up if you choose this option)
 2. **Keep Read-Only** - Keep the volume in read-only mode (all un-encrypted volumes are automatically re-mounted as read-only)
 3. **Eject** - Unmount and eject the volume
 
@@ -207,6 +216,11 @@ sudo /Library/Application\ Support/Custom/DiskEncrypter_Enhanced.sh --dry-run --
 
 ## Version History
 
+### v2.4 - December 10, 2025
+- **CHANGED:** Safer option. It does not offer to erase non-encryptable disks , only mount read only or eject
+- Instructions in dialog to erase disks after backin up data
+- Re-name script from "DiskEncrypter_Enhanced-NO-ERASE.sh" to "DiskEncrypter_Enhanced.sh" to use if installing manually
+  
 ### v2.3 - December 9, 2025
 
 - **Changed:** Auto-mount unencrypted disks as read-only before prompting user
