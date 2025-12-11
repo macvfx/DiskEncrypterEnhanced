@@ -14,9 +14,110 @@
 # v2.4.2 - 12/10/2025 - Improved dialog layout with infobox for detailed instructions
 #                     - Reduced main message text to prevent scrolling
 #                     - Better user experience with cleaner dialog presentation
+# v2.4.3 - 12/10/2025 - Fixed duplicate dialog issue caused by LaunchDaemon re-triggering
+#                     - Added lock file mechanism to prevent concurrent runs
+#                     - Added processed volumes tracking to prevent re-processing
+#                     - Prevents feedback loop from disk unmount events
 
 ## Managed Preferences
 settingsPlist="/Library/Managed Preferences/com.custom.diskencrypter.plist"
+
+## Lock file to prevent concurrent runs
+LOCK_FILE="/var/run/diskencrypter.lock"
+
+## Processed volumes tracking (to avoid re-processing within cooldown period)
+PROCESSED_VOLUMES_FILE="/var/tmp/diskencrypter_processed.txt"
+COOLDOWN_SECONDS=30  # Don't re-process a volume within 30 seconds
+
+###########################################
+########## LOCK FILE FUNCTIONS ############
+###########################################
+
+acquire_lock() {
+    # Try to acquire lock - simpler approach using mkdir atomic operation
+    local max_wait=3
+    local waited=0
+
+    # Try to create lock directory atomically
+    while ! mkdir "$LOCK_FILE" 2>/dev/null; do
+        if [[ $waited -ge $max_wait ]]; then
+            # Check if lock is stale (older than 2 minutes)
+            if [[ -d "$LOCK_FILE" ]]; then
+                local lock_age=$(($(date +%s) - $(stat -f %m "$LOCK_FILE" 2>/dev/null || echo 0)))
+                if [[ $lock_age -gt 120 ]]; then
+                    # Stale lock, remove it
+                    rm -rf "$LOCK_FILE" 2>/dev/null
+                    continue
+                fi
+            fi
+            return 1
+        fi
+        sleep 1
+        waited=$((waited + 1))
+    done
+
+    # Write PID to lock file
+    echo $$ > "$LOCK_FILE/pid"
+    return 0
+}
+
+release_lock() {
+    rm -rf "$LOCK_FILE" 2>/dev/null
+}
+
+###########################################
+######### PROCESSED VOLUMES TRACKING ######
+###########################################
+
+is_recently_processed() {
+    local volumeID=$1
+
+    [[ ! -f "$PROCESSED_VOLUMES_FILE" ]] && return 1
+
+    local now=$(date +%s)
+    local found=false
+
+    # Read existing entries and check if volume was recently processed
+    while IFS='|' read -r vol timestamp; do
+        if [[ "$vol" == "$volumeID" ]]; then
+            local age=$((now - timestamp))
+            if [[ $age -lt $COOLDOWN_SECONDS ]]; then
+                log_info "Volume $volumeID was processed ${age}s ago (within ${COOLDOWN_SECONDS}s cooldown), skipping"
+                return 0
+            fi
+        fi
+    done < "$PROCESSED_VOLUMES_FILE"
+
+    return 1
+}
+
+mark_as_processed() {
+    local volumeID=$1
+    local now=$(date +%s)
+
+    # Create temp file with old entries (excluding expired ones and current volume)
+    local temp_file="${PROCESSED_VOLUMES_FILE}.tmp"
+    : > "$temp_file"
+
+    if [[ -f "$PROCESSED_VOLUMES_FILE" ]]; then
+        while IFS='|' read -r vol timestamp; do
+            local age=$((now - timestamp))
+            # Keep entries that are not expired and not the current volume
+            if [[ $age -lt $COOLDOWN_SECONDS ]] && [[ "$vol" != "$volumeID" ]]; then
+                echo "$vol|$timestamp" >> "$temp_file"
+            fi
+        done < "$PROCESSED_VOLUMES_FILE"
+    fi
+
+    # Add current volume
+    echo "$volumeID|$now" >> "$temp_file"
+
+    # Replace old file
+    mv "$temp_file" "$PROCESSED_VOLUMES_FILE"
+    chmod 644 "$PROCESSED_VOLUMES_FILE" 2>/dev/null
+
+    log_debug "Marked $volumeID as processed at $now"
+}
 
 ###########################################
 ########## COMMAND LINE ARGUMENTS #########
@@ -293,6 +394,7 @@ cleanup() {
     log_debug "Cleaning up sensitive data from memory"
     unset Password
     unset Passphrase
+    release_lock
 }
 
 trap cleanup EXIT
@@ -806,17 +908,29 @@ processNonEncryptableDisk() {
         log_info "$loggedInUser chose to eject $DiskID ($volumeName)"
         log_operation "diskutil unmountDisk" "$DiskID"
         [[ "$DRY_RUN" != "yes" ]] && diskutil unmountDisk "$DiskID" 2>/dev/null
+
+        # Mark as processed to prevent re-triggering
+        mark_as_processed "$VolumeID"
+
         return 3
         ;;
         2)
         # Button 2: Keep Read-Only
         log_info "$loggedInUser chose to keep $DiskID ($volumeName) mounted as read-only"
         # Volume is already mounted read-only from discovery phase
+
+        # Mark as processed to prevent re-triggering
+        mark_as_processed "$VolumeID"
+
         return 2
         ;;
         *)
         # Any other exit code (e.g., dialog closed)
         log_info "Dialog closed by user for $DiskID ($volumeName), keeping read-only"
+
+        # Mark as processed to prevent re-triggering
+        mark_as_processed "$VolumeID"
+
         return 2
         ;;
     esac
@@ -882,6 +996,12 @@ rotate_logs() {
 ###########################################
 
 main() {
+    # Try to acquire lock - exit silently if another instance is running
+    if ! acquire_lock; then
+        log_info "Another instance is running, exiting gracefully"
+        exit 0
+    fi
+
     # Rotate logs at the start of each run
     rotate_logs
     # Determine configuration source
@@ -896,7 +1016,7 @@ main() {
 
     log_info "========================================="
     log_info "DiskEncrypter Script Starting"
-    log_info "Version: 2.4.2 (Improved Dialog UX)"
+    log_info "Version: 2.4.3 (Lock File Fix)"
     log_info "========================================="
     log_info "DRY RUN MODE: $DRY_RUN (source: $dryRunSource)"
     log_info "LOG LEVEL: $LOG_LEVEL (source: $logLevelSource)"
@@ -1017,6 +1137,11 @@ main() {
 
                         log_verbose "Checking volume: $VolumeID"
 
+                        # Check if recently processed
+                        if is_recently_processed "$VolumeID"; then
+                            continue
+                        fi
+
                         # Get detailed info for this specific volume
                         # Use grep with context to get 10 lines after the volume marker
                         volumeInfo=$(echo "$apfsInfo" | grep -A 10 "+-> Volume $VolumeID ")
@@ -1090,6 +1215,11 @@ main() {
 
                 log_verbose "Checking HFS+ volume: $VolumeID"
 
+                # Check if recently processed
+                if is_recently_processed "$VolumeID"; then
+                    continue
+                fi
+
                 volumeName=$(diskutil info "$VolumeID" 2>/dev/null | grep "Volume Name:" | sed 's/.*Volume Name:[[:space:]]*//')
                 if [[ -z "$volumeName" ]]; then
                     volumeName="ExternalDisk"
@@ -1132,6 +1262,11 @@ main() {
                 [[ -z "$VolumeID" ]] && continue
 
                 log_verbose "Checking ExFAT/FAT/NTFS volume: $VolumeID"
+
+                # Check if recently processed
+                if is_recently_processed "$VolumeID"; then
+                    continue
+                fi
 
                 volumeName=$(diskutil info "$VolumeID" 2>/dev/null | grep "Volume Name:" | sed 's/.*Volume Name:[[:space:]]*//')
                 if [[ -z "$volumeName" ]]; then
