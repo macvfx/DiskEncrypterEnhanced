@@ -79,7 +79,7 @@ tail -f /var/log/diskencrypter_error.log
 ## Key Features
 
 ### Safer Handling of Unencrypted Volumes ###
-- in v.2.4.2 there is no erase option option
+- in v.2.4.2 there is no erase option
 - instructions for erasing after backups only
   
 ### Automatic Encryption Enforcement
