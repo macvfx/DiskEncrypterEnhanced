@@ -1,7 +1,7 @@
 # DiskEncryption 2.0 "Enhanced"
 
-- **Version:** 2.3
-- **Date:** December 9, 2025
+- **Version:** 2.4
+- **Date:** December 10, 2025
 - **Compatibility:** macOS 15+ (Sequoia) and macOS 26+
 
 ## What's New in 2.4
