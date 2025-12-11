@@ -1,10 +1,10 @@
 # DiskEncryption 2.0 "Enhanced"
 
-- **Version:** 2.4
-- **Date:** December 10, 2025
+- **Version:** 2.4.3
+- **Date:** December 11, 2025
 - **Compatibility:** macOS 15+ (Sequoia) and macOS 26+
 
-## What's New in 2.4
+## What's New in 2.4.3
 - **CHANGED:** Safer option. It does not offer to erase non-encryptable disks , only mount read only or eject
 - Instructions in dialog to erase disks after backin up data
 - Re-name script from "DiskEncrypter_Enhanced-NO-ERASE.sh" to "DiskEncrypter_Enhanced.sh" to use if installing manually
@@ -12,6 +12,7 @@
 ## What's New in v2.3
 
 - **Changed:** Auto-mount unencrypted disks as read-only before prompting user
+- Use "DiskEncrypter_Enhanced.sh" v.2.3 to if installing manually for the "EraseEncrypt" option
 - Updated dialog options: "Keep Read-Only", "Eject", "Encrypt"
 - Improved user workflow with safer default (read-only mount)
 - Scans for Internal SD card slot volumes
@@ -215,6 +216,17 @@ sudo /Library/Application\ Support/Custom/DiskEncrypter_Enhanced.sh --dry-run --
 - SwiftDialog (auto-downloaded if not present)
 
 ## Version History
+
+### v2.4.3 - December 10, 2025
+- Fixed duplicate dialog issue caused by LaunchDaemon re-triggering
+- Added lock file mechanism to prevent concurrent runs
+- Added processed volumes tracking to prevent re-processing
+- Prevents feedback loop from disk unmount events
+
+### v2.4.2 - December 10, 2025
+- Improved dialog layout with infobox for detailed instructions
+- Reduced main message text to prevent scrolling
+- Better user experience with cleaner dialog presentation
 
 ### v2.4 - December 10, 2025
 - **CHANGED:** Safer option. It does not offer to erase non-encryptable disks , only mount read only or eject
