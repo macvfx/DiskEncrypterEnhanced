@@ -1,9 +1,17 @@
 # DiskEncryption 2.0 "Enhanced"
 
-- **Version:** 2.4.3
-- **Date:** December 11, 2025
+- **Version:** 2.4.4
+- **Date:** December 12, 2025
 - **Compatibility:** macOS 15+ (Sequoia) and macOS 26+
 
+## What's New in 2.4.4
+- **FIXED:** Passwords can now have spaces when encrypting
+- Fixed a typo in the error dialog
+- Fixed the highlighted text in the installer packge install flow
+
+  *KNOWN ISSUES:*
+- If HFS formatted volume has a MBR pation scheme then conversion to APFS will fail. You will need to erase the drive
+ 
 ## What's New in 2.4.3
 - **CHANGED:** Safer option. It does not offer to erase non-encryptable disks , only mount read only or eject
 - Instructions in dialog to erase disks after backin up data
@@ -11,7 +19,7 @@
 
   *KNOWN ISSUES:*
 - If HFS formatted volume has a MBR pation scheme then conversion to APFS will fail. You will need to erase the drive
-- Password can't have spaces when encrypting. Under active investigation
+- Password can't have spaces when encrypting. 
   
 ## What's New in v2.3
 
@@ -221,7 +229,12 @@ sudo /Library/Application\ Support/Custom/DiskEncrypter_Enhanced.sh --dry-run --
 
 ## Version History
 
-### v2.4.3 - December 10, 2025
+### v2.4.4 - December 12, 2025
+- **FIXED:** Passwords can now have spaces when encrypting
+- Fixed a typo in the error dialog
+- Fixed the highlighted text in the installer packge install flow
+  
+### v2.4.3 - December 11, 2025
 - Fixed duplicate dialog issue caused by LaunchDaemon re-triggering
 - Added lock file mechanism to prevent concurrent runs
 - Added processed volumes tracking to prevent re-processing
