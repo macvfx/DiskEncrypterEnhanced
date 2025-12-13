@@ -18,6 +18,8 @@
 #                     - Added lock file mechanism to prevent concurrent runs
 #                     - Added processed volumes tracking to prevent re-processing
 #                     - Prevents feedback loop from disk unmount events
+# v2.4.4 - 12/12/2025 - Fixed password regex to allow spaces in passwords
+#                     - Fixed typo in error message: "leasts" -> "least"
 
 ## Managed Preferences
 settingsPlist="/Library/Managed Preferences/com.custom.diskencrypter.plist"
@@ -366,8 +368,8 @@ readSettingsFile(){
     secondTitlePassword=$( readSetting secondTitlePassword "Enter the password you want to use to encrypt the removable media" )
     placeholderPassword=$( readSetting placeholderPassword "Enter password here" )
     secondaryButtonLabelPassword=$( readSetting secondaryButtonLabelPassword "Keep Read-Only" )
-    passwordRegex=$( readSetting passwordRegex "^[^\s]{4,}$" )
-    passwordRegexErrorMessage=$( readSetting passwordRegexErrorMessage "The provided password does not meet the requirements, please use at leasts 4 characters" )
+    passwordRegex=$( readSetting passwordRegex "^.{4,}$" )
+    passwordRegexErrorMessage=$( readSetting passwordRegexErrorMessage "The provided password does not meet the requirements, please use at least 4 characters" )
 
     ## Hint text and REGEX requirements
     subTitleHint=$( readSetting subTitleHint "Optionally you can specify a hint, a password hint is a sort of reminder that helps the user remember their password." )
@@ -1016,7 +1018,7 @@ main() {
 
     log_info "========================================="
     log_info "DiskEncrypter Script Starting"
-    log_info "Version: 2.4.3 (Lock File Fix)"
+    log_info "Version: 2.4.4 (Password Spaces Fix)"
     log_info "========================================="
     log_info "DRY RUN MODE: $DRY_RUN (source: $dryRunSource)"
     log_info "LOG LEVEL: $LOG_LEVEL (source: $logLevelSource)"
