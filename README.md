@@ -9,6 +9,10 @@
 - Instructions in dialog to erase disks after backin up data
 - Re-name script from "DiskEncrypter_Enhanced-NO-ERASE.sh" to "DiskEncrypter_Enhanced.sh" to use if installing manually
 
+  *KNOWN ISSUES:*
+- If HFS formatted volume has a MBR pation scheme then conversion to APFS will fail. You will need to erase the drive
+- Password can't have spaces when encrypting. Under active investigation
+  
 ## What's New in v2.3
 
 - **Changed:** Auto-mount unencrypted disks as read-only before prompting user
