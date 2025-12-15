@@ -20,6 +20,9 @@
 #                     - Prevents feedback loop from disk unmount events
 # v2.4.4 - 12/12/2025 - Fixed password regex to allow spaces in passwords
 #                     - Fixed typo in error message: "leasts" -> "least"
+# v2.4.5 - 12/15/2025 - Fixed password hint regex to allow spaces in hints
+#                     - Changed hintRegex from "^[^\s]{6,}$" to "^.{6,}$"
+#                     - Updated hint error message for clarity
 
 ## Managed Preferences
 settingsPlist="/Library/Managed Preferences/com.custom.diskencrypter.plist"
@@ -377,8 +380,8 @@ readSettingsFile(){
     secondaryButtonLabelHint=$( readSetting secondaryButtonLabelHint "Encrypt w/o hint" )
     secondTitleHint=$( readSetting secondTitleHint "Enter the hint you want to set" )
     placeholderHint=$( readSetting placeholderHint "Enter hint here" )
-    hintRegex=$( readSetting hintRegex "^[^\s]{6,}$" )
-    hintRegexErrorMessage=$( readSetting hintRegexErrorMessage "The provided hint does not meet the requirements, please use a stronger hint that contains 6 characters" )
+    hintRegex=$( readSetting hintRegex "^.{6,}$" )
+    hintRegexErrorMessage=$( readSetting hintRegexErrorMessage "The provided hint does not meet the requirements, please use a hint that contains at least 6 characters" )
 
     ## Progress bar text
     titleProgress=$( readSetting titleProgress "Disk Encryption Progress" )
