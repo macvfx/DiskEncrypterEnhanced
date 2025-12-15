@@ -1,9 +1,9 @@
 # DiskEncrypter Evolution Guide
-## From DiskEncrypter.sh to DiskEncrypter_Enhanced.sh v2.4.3
+## From DiskEncrypter.sh to DiskEncrypter_Enhanced.sh v2.4.5
 
-- **Document Version:** 2.3
-- **Date:** December 11, 2025
-- **Author:** MacVFX
+**Document Version:** 2.4.5
+**Date:** December 15, 2025
+**Author:** MacVFX
 
 ---
 
@@ -1478,6 +1478,226 @@ mark_as_processed "$VolumeID"  # 30-second cooldown
 
 ---
 
+### Critical Bug Fix v2.4.4: Password Spaces Not Allowed ⭐ IMPORTANT
+
+#### The Bug
+```bash
+# v2.4.3 regex (WRONG - excludes spaces)
+passwordRegex=$( readSetting passwordRegex "^[^\s]{4,}$" )
+passwordRegexErrorMessage="The provided password does not meet the requirements, please use at leasts 4 characters"
+```
+
+#### Why It Failed
+```bash
+# The regex pattern ^[^\s]{4,}$ means:
+# ^ = start of string
+# [^\s]{4,} = 4 or more characters that are NOT whitespace
+# $ = end of string
+
+# Examples:
+"test"              → ✅ Valid (no spaces)
+"mypassword123"     → ✅ Valid (no spaces)
+"my pass"           → ❌ REJECTED (contains space)
+"super secret key"  → ❌ REJECTED (contains spaces)
+```
+
+**User Impact:**
+- Users couldn't use passphrases with spaces
+- Common patterns like "my secure password" were rejected
+- Error message had typo: "at leasts 4 characters"
+- Reduced password strength options
+
+#### The Fix
+```bash
+# v2.4.4 regex (CORRECT - allows any characters)
+passwordRegex=$( readSetting passwordRegex "^.{4,}$" )
+passwordRegexErrorMessage="The provided password does not meet the requirements, please use at least 4 characters"
+```
+
+**Pattern Explanation:**
+```bash
+# The regex pattern ^.{4,}$ means:
+# ^ = start of string
+# .{4,} = 4 or more of ANY character (including spaces)
+# $ = end of string
+
+# Examples:
+"test"              → ✅ Valid
+"mypassword123"     → ✅ Valid
+"my pass"           → ✅ Valid (now accepted!)
+"super secret key"  → ✅ Valid (now accepted!)
+```
+
+#### Changes Made
+
+**Line 371-372 in DiskEncrypter_Enhanced.sh:**
+
+**Before (v2.4.3):**
+```bash
+passwordRegex=$( readSetting passwordRegex "^[^\s]{4,}$" )
+passwordRegexErrorMessage=$( readSetting passwordRegexErrorMessage "The provided password does not meet the requirements, please use at leasts 4 characters" )
+```
+
+**After (v2.4.4):**
+```bash
+passwordRegex=$( readSetting passwordRegex "^.{4,}$" )
+passwordRegexErrorMessage=$( readSetting passwordRegexErrorMessage "The provided password does not meet the requirements, please use at least 4 characters" )
+```
+
+#### Benefits
+
+**Password Flexibility:**
+- ✅ Supports passphrases with spaces
+- ✅ Allows patterns like "my secure password"
+- ✅ Better compliance with passphrase best practices
+- ✅ Users can use memorable phrases
+
+**Grammar Fix:**
+- ✅ Fixed typo: "leasts" → "least"
+- ✅ Professional, correct error message
+- ✅ Better user experience
+
+**Security Improvement:**
+- ✅ Encourages longer passphrases (easier with spaces)
+- ✅ More flexible password policies
+- ✅ Better user compliance (no workarounds)
+
+#### Valid Password Examples
+
+**All of these now work:**
+```bash
+"test"                          → ✅ 4 characters
+"my pass"                       → ✅ 7 characters (with space)
+"super secure password"         → ✅ 22 characters
+"I love my cat 2024"           → ✅ 18 characters
+"Coffee-at-3pm!"               → ✅ 14 characters
+```
+
+**Still rejected (too short):**
+```bash
+"abc"                           → ❌ Only 3 characters
+"no"                            → ❌ Only 2 characters
+""                              → ❌ Empty
+```
+
+**Impact:**
+- **Severity:** MEDIUM - Prevented valid passwords with spaces
+- **Frequency:** Every time user entered password with spaces
+- **User Impact:** Frustration, confusion, weaker passwords
+- **Status:** ✅ FIXED in v2.4.4
+
+---
+
+### Critical Bug Fix v2.4.5: Password Hint Spaces Not Allowed ⭐ IMPORTANT
+
+#### The Bug
+```bash
+# v2.4.4 regex (WRONG - excludes spaces)
+hintRegex=$( readSetting hintRegex "^[^\s]{6,}$" )
+hintRegexErrorMessage="The provided hint does not meet the requirements, please use a stronger hint that contains 6 characters"
+```
+
+#### Why It Failed
+```bash
+# The regex pattern ^[^\s]{6,}$ means:
+# ^ = start of string
+# [^\s]{6,} = 6 or more characters that are NOT whitespace
+# $ = end of string
+
+# Examples:
+"secret"                    → ✅ Valid (no spaces)
+"myhintsecure"              → ✅ Valid (no spaces)
+"my hint"                   → ❌ REJECTED (contains space)
+"favorite vacation spot"    → ❌ REJECTED (contains spaces)
+```
+
+**User Impact:**
+- Users couldn't use multi-word hints with spaces
+- Common patterns like "favorite pet name" were rejected
+- Reduced hint usefulness (multi-word hints are more memorable)
+- Inconsistent with password behavior (which allows spaces)
+
+#### The Fix
+```bash
+# v2.4.5 regex (CORRECT - allows any characters)
+hintRegex=$( readSetting hintRegex "^.{6,}$" )
+hintRegexErrorMessage="The provided hint does not meet the requirements, please use a hint that contains at least 6 characters"
+```
+
+**Pattern Explanation:**
+```bash
+# The regex pattern ^.{6,}$ means:
+# ^ = start of string
+# .{6,} = 6 or more of ANY character (including spaces)
+# $ = end of string
+
+# Examples:
+"secret"                    → ✅ Valid
+"myhintsecure"              → ✅ Valid
+"my hint"                   → ✅ Valid (now accepted!)
+"favorite vacation spot"    → ✅ Valid (now accepted!)
+```
+
+#### Changes Made
+
+**Line 380-381 in DiskEncrypter_Enhanced.sh:**
+
+**Before (v2.4.4):**
+```bash
+hintRegex=$( readSetting hintRegex "^[^\s]{6,}$" )
+hintRegexErrorMessage=$( readSetting hintRegexErrorMessage "The provided hint does not meet the requirements, please use a stronger hint that contains 6 characters" )
+```
+
+**After (v2.4.5):**
+```bash
+hintRegex=$( readSetting hintRegex "^.{6,}$" )
+hintRegexErrorMessage=$( readSetting hintRegexErrorMessage "The provided hint does not meet the requirements, please use a hint that contains at least 6 characters" )
+```
+
+#### Benefits
+
+**Hint Flexibility:**
+- ✅ Supports multi-word hints with spaces
+- ✅ Allows patterns like "favorite vacation spot"
+- ✅ Better hint usefulness (more descriptive)
+- ✅ Users can create more memorable hints
+
+**Error Message Improvement:**
+- ✅ Removed confusing "stronger" terminology
+- ✅ Clearer message: "at least 6 characters"
+- ✅ Better user experience
+
+**Consistency:**
+- ✅ Matches password handling (spaces allowed)
+- ✅ Uniform user experience
+- ✅ No confusion about space support
+
+#### Valid Hint Examples
+
+**All of these now work:**
+```bash
+"secret"                        → ✅ 6 characters
+"my hint"                       → ✅ 7 characters (with space)
+"favorite vacation spot"        → ✅ 23 characters
+"first pet name"                → ✅ 14 characters
+"Coffee shop Paris"             → ✅ 17 characters
+```
+
+**Still rejected (too short):**
+```bash
+"short"                         → ❌ Only 5 characters
+"hint"                          → ❌ Only 4 characters
+""                              → ❌ Empty
+```
+
+**Impact:**
+- **Severity:** MEDIUM - Prevented useful multi-word hints
+- **Frequency:** Every time user entered hint with spaces
+- **User Impact:** Less useful hints, frustration
+- **Status:** ✅ FIXED in v2.4.5
+
+---
+
 ### Other Bug Fixes
 
 #### 1. Memory Cleanup (v2.1)
@@ -1792,11 +2012,25 @@ Enhanced version provides **superset** of original functionality - no features r
 - ✅ **Critical bug fix** - Resolves LaunchDaemon re-triggering issue
 - ✅ **Zero breaking changes** - Drop-in replacement for v2.4.2
 
+### v2.4.4 - December 12, 2025
+- ✅ **Password spaces support** - Fixed regex to allow spaces in passwords
+- ✅ **Error message typo** - Fixed "leasts" → "least"
+- ✅ **Regex improvement** - Changed from `^[^\s]{4,}$` to `^.{4,}$`
+- ✅ **Better password flexibility** - Users can now use passphrases with spaces
+- ✅ **Zero breaking changes** - Drop-in replacement for v2.4.3
+
+### v2.4.5 - December 15, 2025
+- ✅ **Password hint spaces support** - Fixed regex to allow spaces in hints
+- ✅ **Hint regex improvement** - Changed from `^[^\s]{6,}$` to `^.{6,}$`
+- ✅ **Error message clarity** - Updated hint error message for better readability
+- ✅ **Better hint flexibility** - Users can now use multi-word hints like "favorite vacation spot"
+- ✅ **Zero breaking changes** - Drop-in replacement for v2.4.4
+
 ---
 
 ## Conclusion
 
-The evolution from `DiskEncrypter.sh` to `DiskEncrypter_Enhanced.sh` v2.4.3 represents a complete modernization of the script, transforming it from a basic utility into an enterprise-grade encryption enforcement system with advanced security features, comprehensive user protection, intelligent data safety for camera cards and portable media, a polished user interface, and robust concurrent execution protection.
+The evolution from `DiskEncrypter.sh` to `DiskEncrypter_Enhanced.sh` v2.4.5 represents a complete modernization of the script, transforming it from a basic utility into an enterprise-grade encryption enforcement system with advanced security features, comprehensive user protection, intelligent data safety for camera cards and portable media, a polished user interface, robust concurrent execution protection, and flexible password and hint policies that support modern passphrase best practices with full support for spaces.
 
 ### Key Achievements
 - **+157% more code** for comprehensive features
@@ -1834,10 +2068,10 @@ The evolution from `DiskEncrypter.sh` to `DiskEncrypter_Enhanced.sh` v2.4.3 repr
 - ✅ **Feedback loop prevention**: No duplicate dialogs from unmount events (v2.4.3)
 - ✅ **Volume tracking**: 30-second cooldown prevents re-processing (v2.4.3)
 
-**Recommendation:** Deploy v2.4.3 with confidence. The enhanced version is a drop-in replacement with significant improvements, zero breaking changes, industry-leading security features that protect data from the moment of detection while preventing accidental erasure of camera cards and portable media, plus a polished user interface that delivers superior UX, and robust protection against concurrent execution issues.
+**Recommendation:** Deploy v2.4.5 with confidence. The enhanced version is a drop-in replacement with significant improvements, zero breaking changes, industry-leading security features that protect data from the moment of detection while preventing accidental erasure of camera cards and portable media, plus a polished user interface that delivers superior UX, robust protection against concurrent execution issues, and modern password and hint flexibility that supports passphrases and hints with spaces.
 
 ---
 
 **Document maintained by:** MacVFX
-**Last updated:** December 11, 2025
-**Version:** 2.4.3
+**Last updated:** December 15, 2025
+**Version:** 2.4.5
