@@ -6,7 +6,7 @@
 
 ## What's New in 2.4.5
 - **FIXED:** Password hints can now have spaces when encrypting
-- 
+  
 ## What's New in 2.4.4
 - **FIXED:** Passwords can now have spaces when encrypting
 - Fixed a typo in the error dialog
