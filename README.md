@@ -1,9 +1,12 @@
 # DiskEncryption 2.0 "Enhanced"
 
-- **Version:** 2.4.4
-- **Date:** December 12, 2025
+- **Version:** 2.4.5
+- **Date:** December 15, 2025
 - **Compatibility:** macOS 15+ (Sequoia) and macOS 26+
 
+## What's New in 2.4.5
+- **FIXED:** Password hints can now have spaces when encrypting
+- 
 ## What's New in 2.4.4
 - **FIXED:** Passwords can now have spaces when encrypting
 - Fixed a typo in the error dialog
@@ -92,12 +95,12 @@ tail -f /var/log/diskencrypter_error.log
 ## Key Features
 
 ### Safer Handling of Unencrypted Volumes ###
-- in v.2.4.2 there is no erase option
+- in v.2.4.2 and above there is no erase option (NO_ERASE version of the script)
 - instructions for erasing after backups only
   
 ### Automatic Encryption Enforcement
 - Automatically detects unencrypted external drives and mounts as read-only **(v.2.3)**
-- Prompts users to encrypt, eject or keep mounted as read-only
+- Prompts users to encrypt, eject or keep mounted as read-only **(Encrypt and erase option only in v.2.3)**
 - Supports APFS, HFS+, ExFAT/FAT/NTFS volumes
 
 ### Smart Volume Handling (v2.2)
@@ -229,6 +232,9 @@ sudo /Library/Application\ Support/Custom/DiskEncrypter_Enhanced.sh --dry-run --
 
 ## Version History
 
+### v2.4.5 - December 15, 2025
+- **FIXED:** Password hints can now have spaces when encrypting
+  
 ### v2.4.4 - December 12, 2025
 - **FIXED:** Passwords can now have spaces when encrypting
 - Fixed a typo in the error dialog
