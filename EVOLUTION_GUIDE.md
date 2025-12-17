@@ -1696,6 +1696,50 @@ hintRegexErrorMessage=$( readSetting hintRegexErrorMessage "The provided hint do
 - **User Impact:** Less useful hints, frustration
 - **Status:** ✅ FIXED in v2.4.5
 
+#### Additional Fix: Package Builder Managed Preferences
+
+**The Secondary Bug:**
+
+Even though the script (DiskEncrypter_Enhanced.sh) had the correct regex in v2.4.5, the package builders (make_package.sh and make_package_NotSigned.sh) were still creating managed preferences templates with the OLD broken regex.
+
+**Line 296 in both package scripts (WRONG):**
+```xml
+<key>hintRegex</key>
+<string>^[^\s]{6,}$</string>
+```
+
+**Why This Mattered:**
+- When packages were built and installed, they deployed `/Library/Managed Preferences/com.custom.diskencrypter.plist`
+- This plist contained the OLD regex that blocked spaces
+- The script's default (`^.{6,}$`) was overridden by the managed preference
+- Users installing from package still couldn't use hints with spaces
+- Manual script installation worked, but packaged installation failed
+
+**The Fix:**
+
+Updated both package builders to use the correct regex:
+
+**Line 296 in both make_package.sh and make_package_NotSigned.sh (CORRECT):**
+```xml
+<key>hintRegex</key>
+<string>^.{6,}$</string>
+```
+
+**Files Modified:**
+- `/Users/xavier/Downloads/2025 Claude Code/Force Encryption/v2.4.5/make_package.sh`
+- `/Users/xavier/Downloads/2025 Claude Code/Force Encryption/v2.4.5/make_package_NotSigned.sh`
+
+**Additional Improvements:**
+
+1. **Version String Correction** - Updated logged version from "2.4.4" to "2.4.5" (line 1024 in script)
+2. **Package Naming** - Signed package now outputs as `DiskEncrypter_Enhanced_v2.4.5_signed.pkg` (clearer distinction)
+
+**Result:**
+- ✅ Script defaults to correct regex
+- ✅ Managed preferences deployed by packages use correct regex
+- ✅ Both manual and packaged installations now support hints with spaces
+- ✅ Consistent behavior across all deployment methods
+
 ---
 
 ### Other Bug Fixes
@@ -2024,6 +2068,10 @@ Enhanced version provides **superset** of original functionality - no features r
 - ✅ **Hint regex improvement** - Changed from `^[^\s]{6,}$` to `^.{6,}$`
 - ✅ **Error message clarity** - Updated hint error message for better readability
 - ✅ **Better hint flexibility** - Users can now use multi-word hints like "favorite vacation spot"
+- ✅ **Package builder fixes** - Updated both make_package.sh and make_package_NotSigned.sh with correct hint regex
+- ✅ **Managed preferences template** - Fixed hintRegex in package installer templates
+- ✅ **Version string correction** - Updated logged version from 2.4.4 to 2.4.5
+- ✅ **Package naming improvement** - Signed packages now include "_signed" suffix for clarity
 - ✅ **Zero breaking changes** - Drop-in replacement for v2.4.4
 
 ---
