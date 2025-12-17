@@ -21,6 +21,7 @@
 # v2.4.4 - 12/12/2025 - Fixed password regex to allow spaces in passwords
 #                     - Fixed typo in error message: "leasts" -> "least"
 # v2.4.5 - 12/15/2025 - Fixed password hint regex to allow spaces in hints
+#                    -  Fixed in Managed Preferences 2nd fix and installer makers
 #                     - Changed hintRegex from "^[^\s]{6,}$" to "^.{6,}$"
 #                     - Updated hint error message for clarity
 
@@ -1021,7 +1022,7 @@ main() {
 
     log_info "========================================="
     log_info "DiskEncrypter Script Starting"
-    log_info "Version: 2.4.4 (Password Spaces Fix)"
+    log_info "Version: 2.4.5 (Password & Hint Spaces Fix)"
     log_info "========================================="
     log_info "DRY RUN MODE: $DRY_RUN (source: $dryRunSource)"
     log_info "LOG LEVEL: $LOG_LEVEL (source: $logLevelSource)"
