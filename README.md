@@ -6,6 +6,7 @@
 
 ## What's New in 2.4.5
 - **FIXED:** Password hints can now have spaces when encrypting
+- Fixed it twice. Should really work now. Default Managed Pref was blocking.
   
 ## What's New in 2.4.4
 - **FIXED:** Passwords can now have spaces when encrypting
