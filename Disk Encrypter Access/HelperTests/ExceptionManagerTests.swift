@@ -2,6 +2,39 @@ import Foundation
 import XCTest
 
 final class ExceptionManagerTests: XCTestCase {
+    func testDiskResolutionUsesDirectStableUUIDLookup() throws {
+        let uuid = "11111111-2222-3333-4444-555555555555"
+        let plist: [String: Any] = [
+            "DeviceIdentifier": "disk8s1",
+            "Internal": false,
+            "WholeDisk": false,
+            "BusProtocol": "USB",
+            "MountPoint": "/Volumes/Example_Media",
+            "VolumeName": "Example Media",
+            "VolumeUUID": uuid,
+            "FilesystemName": "ExFAT",
+            "ParentWholeDisk": "disk8",
+            "TotalSize": 64_000_000_000 as NSNumber,
+            "Writable": false,
+        ]
+        let runner = RecordingDiskutilRunner(
+            output: CommandOutput(
+                status: 0,
+                stdout: try PropertyListSerialization.data(
+                    fromPropertyList: plist,
+                    format: .xml,
+                    options: 0
+                ),
+                stderr: Data()
+            )
+        )
+
+        let resolved = try DiskMutationController(runner: runner).resolve(volumeUUID: uuid)
+
+        XCTAssertEqual(resolved?.bsdName, "disk8s1")
+        XCTAssertEqual(runner.requests, [["info", "-plist", uuid]])
+    }
+
     func testGrantAndAutomaticExpiryRestoreReadOnly() throws {
         let root = FileManager.default.temporaryDirectory
             .appendingPathComponent("DiskEncrypterAccessHelperTests-\(UUID().uuidString)", isDirectory: true)
@@ -99,6 +132,24 @@ final class ExceptionManagerTests: XCTestCase {
         XCTAssertNotNil(try store.read())
         XCTAssertTrue(try String(contentsOf: paths.auditURL, encoding: .utf8)
             .contains("\"action\":\"expirationPending\""))
+    }
+}
+
+private final class RecordingDiskutilRunner: CommandRunning, @unchecked Sendable {
+    private let lock = NSLock()
+    private let output: CommandOutput
+    private var storedRequests: [[String]] = []
+
+    init(output: CommandOutput) {
+        self.output = output
+    }
+
+    var requests: [[String]] { lock.withLock { storedRequests } }
+
+    func run(_ executable: String, arguments: [String]) throws -> CommandOutput {
+        XCTAssertEqual(executable, "/usr/sbin/diskutil")
+        lock.withLock { storedRequests.append(arguments) }
+        return output
     }
 }
 

@@ -13,17 +13,27 @@ protocol DiskControlling: Sendable {
 
 struct DiskMutationController: DiskControlling {
     private let runner: any CommandRunning
-    private let discovery: DiskutilVolumeDiscovery
 
     init(runner: any CommandRunning = ProcessCommandRunner()) {
         self.runner = runner
-        discovery = DiskutilVolumeDiscovery(runner: runner)
     }
 
     func resolve(volumeUUID: String) throws -> ExternalVolume? {
-        try discovery.mountedUnencryptedExternalVolumesSync().first {
-            $0.volumeUUID?.caseInsensitiveCompare(volumeUUID) == .orderedSame
-        }
+        let output = try runner.run(
+            "/usr/sbin/diskutil",
+            arguments: ["info", "-plist", volumeUUID]
+        )
+        guard output.status == 0,
+              let info = try? PropertyListSerialization.propertyList(
+                  from: output.stdout,
+                  options: [],
+                  format: nil
+              ) as? [String: Any],
+              let identifier = info["DeviceIdentifier"] as? String,
+              let volume = DiskutilVolumeDiscovery.parseVolumeInfo(info, identifier: identifier),
+              volume.volumeUUID?.caseInsensitiveCompare(volumeUUID) == .orderedSame
+        else { return nil }
+        return volume
     }
 
     func remountWritable(volumeUUID: String) throws -> ExternalVolume {

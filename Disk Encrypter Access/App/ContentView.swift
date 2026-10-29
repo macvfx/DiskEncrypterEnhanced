@@ -15,10 +15,15 @@ struct ContentView: View {
                 }
                 volumeSection
                 exceptionSection
-                footer
             }
             .padding(24)
             .frame(maxWidth: .infinity, alignment: .leading)
+        }
+        .safeAreaInset(edge: .bottom) {
+            footer
+                .padding(.horizontal, 24)
+                .padding(.vertical, 12)
+                .background(.bar)
         }
         .task { await model.refreshVolumes() }
         .task {
@@ -170,11 +175,17 @@ struct ContentView: View {
             Button("Helper Unavailable") {}
                 .disabled(true)
         case .ready:
-            Button("Start Timed Exception") {
-                Task { await model.startException() }
+            if model.isChangingException {
+                ProgressView()
+                    .controlSize(.small)
+                    .accessibilityLabel("Changing disk access")
+            } else {
+                Button("Start Timed Exception") {
+                    Task { await model.startException() }
+                }
+                .buttonStyle(.borderedProminent)
+                .disabled(!model.canStartException)
             }
-            .buttonStyle(.borderedProminent)
-            .disabled(!model.canStartException)
         }
     }
 }
@@ -186,13 +197,13 @@ private struct ActiveExceptionCard: View {
     var body: some View {
         TimelineView(.periodic(from: .now, by: 1)) { context in
             HStack(spacing: 12) {
-                Image(systemName: active.status == .expirationPending ? "exclamationmark.shield.fill" : "clock.badge.checkmark.fill")
+                Image(systemName: iconName)
                     .font(.title2)
-                    .foregroundStyle(active.status == .expirationPending ? .red : .orange)
+                    .foregroundStyle(iconColor)
                 VStack(alignment: .leading, spacing: 3) {
-                    Text(active.status == .expirationPending ? "Protection restoration pending" : "Writing exception active")
+                    Text(statusTitle)
                         .font(.headline)
-                    Text("\(active.volumeName) • \(remaining(at: context.date))")
+                    Text(statusDetail(at: context.date))
                         .font(.callout)
                     Text(active.note)
                         .font(.caption)
@@ -200,10 +211,43 @@ private struct ActiveExceptionCard: View {
                         .lineLimit(2)
                 }
                 Spacer()
-                Button("End Now", role: .destructive, action: revoke)
+                if active.status == .activating {
+                    ProgressView()
+                        .controlSize(.small)
+                        .accessibilityLabel("Enabling writable access")
+                } else {
+                    Button("End Now", role: .destructive, action: revoke)
+                }
             }
             .padding(12)
             .background(.orange.opacity(0.10), in: RoundedRectangle(cornerRadius: 10))
+        }
+    }
+
+    private var statusTitle: String {
+        switch active.status {
+        case .activating: "Enabling writable access…"
+        case .active: "Writing exception active"
+        case .expirationPending: "Protection restoration pending"
+        }
+    }
+
+    private var iconName: String {
+        switch active.status {
+        case .activating: "clock.arrow.circlepath"
+        case .active: "clock.badge.checkmark.fill"
+        case .expirationPending: "exclamationmark.shield.fill"
+        }
+    }
+
+    private var iconColor: Color {
+        active.status == .expirationPending ? .red : .orange
+    }
+
+    private func statusDetail(at date: Date) -> String {
+        switch active.status {
+        case .activating: "\(active.volumeName) • Please wait"
+        case .active, .expirationPending: "\(active.volumeName) • \(remaining(at: date))"
         }
     }
 
