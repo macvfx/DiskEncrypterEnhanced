@@ -1,0 +1,433 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		110C9D70B790A130EC145DD7 /* DiskEncrypterAccessTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7792500A02338BFF89361819 /* DiskEncrypterAccessTests.swift */; };
+		15396785292CC42C61D02BCA /* ExternalVolume.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC671AF0C83935F281B64F34 /* ExternalVolume.swift */; };
+		2ACCE885B7B109C8D725BAC5 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F843704D89CF542C9B41D952 /* ContentView.swift */; };
+		68DF8F9AF836963556A0F80E /* AdminEligibility.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9194E6814D3DCB88008874B8 /* AdminEligibility.swift */; };
+		9684DAFB3F9AD4F4D653EE9E /* PrivilegedExceptionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E18E624E0A085FC0AF62D290 /* PrivilegedExceptionService.swift */; };
+		D4D5E59CD2AE6B6A7AA70C5B /* DiskEncrypterAccessApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = B76A40EFC3C64C883F3B76BF /* DiskEncrypterAccessApp.swift */; };
+		D7C7557FAFFA283431857485 /* AccessModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FD50934286BF5FBC60171F2 /* AccessModel.swift */; };
+		DCE2AFBE4F7CB79617C607AC /* ExceptionModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81C8C02EE6DC0D8CCD7D46B7 /* ExceptionModels.swift */; };
+		DCF83D878B857285ABB3CC11 /* DiskutilVolumeDiscovery.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB27DF4BBE68D4F68DCD4DB9 /* DiskutilVolumeDiscovery.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		4FC63170A0394005911CF031 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = C4C172C5BEAED97B022CABC2 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 0679FB49E26D8B5623CFD07A;
+			remoteInfo = "Disk Encrypter Access";
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		3FD50934286BF5FBC60171F2 /* AccessModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccessModel.swift; sourceTree = "<group>"; };
+		56427BB12557F828F4ADF8CA /* Disk Encrypter Access.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Disk Encrypter Access.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		7792500A02338BFF89361819 /* DiskEncrypterAccessTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiskEncrypterAccessTests.swift; sourceTree = "<group>"; };
+		81C8C02EE6DC0D8CCD7D46B7 /* ExceptionModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExceptionModels.swift; sourceTree = "<group>"; };
+		89BFF3BD7680FE856A22EF94 /* Disk Encrypter AccessTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Disk Encrypter AccessTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		9194E6814D3DCB88008874B8 /* AdminEligibility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdminEligibility.swift; sourceTree = "<group>"; };
+		B76A40EFC3C64C883F3B76BF /* DiskEncrypterAccessApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiskEncrypterAccessApp.swift; sourceTree = "<group>"; };
+		BB27DF4BBE68D4F68DCD4DB9 /* DiskutilVolumeDiscovery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiskutilVolumeDiscovery.swift; sourceTree = "<group>"; };
+		BC671AF0C83935F281B64F34 /* ExternalVolume.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExternalVolume.swift; sourceTree = "<group>"; };
+		E18E624E0A085FC0AF62D290 /* PrivilegedExceptionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivilegedExceptionService.swift; sourceTree = "<group>"; };
+		F843704D89CF542C9B41D952 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		50FD44F5D5F5E75EC5FCF657 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				56427BB12557F828F4ADF8CA /* Disk Encrypter Access.app */,
+				89BFF3BD7680FE856A22EF94 /* Disk Encrypter AccessTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		7C6F1D6BD7D14F847D619146 = {
+			isa = PBXGroup;
+			children = (
+				FDC25A37AD6F5CBFB607146A /* App */,
+				9815A328A40F059A57222562 /* Core */,
+				982C13FD7B57A5A501E6BFAD /* Tests */,
+				50FD44F5D5F5E75EC5FCF657 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		9815A328A40F059A57222562 /* Core */ = {
+			isa = PBXGroup;
+			children = (
+				3FD50934286BF5FBC60171F2 /* AccessModel.swift */,
+				9194E6814D3DCB88008874B8 /* AdminEligibility.swift */,
+				BB27DF4BBE68D4F68DCD4DB9 /* DiskutilVolumeDiscovery.swift */,
+				81C8C02EE6DC0D8CCD7D46B7 /* ExceptionModels.swift */,
+				BC671AF0C83935F281B64F34 /* ExternalVolume.swift */,
+				E18E624E0A085FC0AF62D290 /* PrivilegedExceptionService.swift */,
+			);
+			path = Core;
+			sourceTree = "<group>";
+		};
+		982C13FD7B57A5A501E6BFAD /* Tests */ = {
+			isa = PBXGroup;
+			children = (
+				7792500A02338BFF89361819 /* DiskEncrypterAccessTests.swift */,
+			);
+			path = Tests;
+			sourceTree = "<group>";
+		};
+		FDC25A37AD6F5CBFB607146A /* App */ = {
+			isa = PBXGroup;
+			children = (
+				F843704D89CF542C9B41D952 /* ContentView.swift */,
+				B76A40EFC3C64C883F3B76BF /* DiskEncrypterAccessApp.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		0679FB49E26D8B5623CFD07A /* Disk Encrypter Access */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D74BA44AE7D770AA5DED1350 /* Build configuration list for PBXNativeTarget "Disk Encrypter Access" */;
+			buildPhases = (
+				D7F3D375A054DD4E28525D3A /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "Disk Encrypter Access";
+			packageProductDependencies = (
+			);
+			productName = "Disk Encrypter Access";
+			productReference = 56427BB12557F828F4ADF8CA /* Disk Encrypter Access.app */;
+			productType = "com.apple.product-type.application";
+		};
+		FDCFFC005CD93BA2DB7A38B4 /* Disk Encrypter AccessTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 18D8FF3E88697DD6BFF0F9B2 /* Build configuration list for PBXNativeTarget "Disk Encrypter AccessTests" */;
+			buildPhases = (
+				85D5F72ECD8A721C64ED6CCF /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				16E98C6FDCC62138A9B9077A /* PBXTargetDependency */,
+			);
+			name = "Disk Encrypter AccessTests";
+			packageProductDependencies = (
+			);
+			productName = "Disk Encrypter AccessTests";
+			productReference = 89BFF3BD7680FE856A22EF94 /* Disk Encrypter AccessTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		C4C172C5BEAED97B022CABC2 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+					0679FB49E26D8B5623CFD07A = {
+						ProvisioningStyle = Automatic;
+					};
+					FDCFFC005CD93BA2DB7A38B4 = {
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = 58EED7A981C7B67B0E2F4D02 /* Build configuration list for PBXProject "DiskEncrypterAccess" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = 7C6F1D6BD7D14F847D619146;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 50FD44F5D5F5E75EC5FCF657 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				0679FB49E26D8B5623CFD07A /* Disk Encrypter Access */,
+				FDCFFC005CD93BA2DB7A38B4 /* Disk Encrypter AccessTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		85D5F72ECD8A721C64ED6CCF /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				110C9D70B790A130EC145DD7 /* DiskEncrypterAccessTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D7F3D375A054DD4E28525D3A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D7C7557FAFFA283431857485 /* AccessModel.swift in Sources */,
+				68DF8F9AF836963556A0F80E /* AdminEligibility.swift in Sources */,
+				2ACCE885B7B109C8D725BAC5 /* ContentView.swift in Sources */,
+				D4D5E59CD2AE6B6A7AA70C5B /* DiskEncrypterAccessApp.swift in Sources */,
+				DCF83D878B857285ABB3CC11 /* DiskutilVolumeDiscovery.swift in Sources */,
+				DCE2AFBE4F7CB79617C607AC /* ExceptionModels.swift in Sources */,
+				15396785292CC42C61D02BCA /* ExternalVolume.swift in Sources */,
+				9684DAFB3F9AD4F4D653EE9E /* PrivilegedExceptionService.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		16E98C6FDCC62138A9B9077A /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 0679FB49E26D8B5623CFD07A /* Disk Encrypter Access */;
+			targetProxy = 4FC63170A0394005911CF031 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		0512D7F7CBFBE2923102ACF1 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		4FA27A5DDC6498712BAFC5C4 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				COMBINE_HIDPI_IMAGES = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "Disk Encrypter Access";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
+				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.macvfx.DiskEncrypterAccess;
+				PRODUCT_NAME = "Disk Encrypter Access";
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		72C0E2CCED4505491FC9D521 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		8C6206B0D108E716746A99DD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.macvfx.DiskEncrypterAccessTests;
+				SDKROOT = macosx;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Disk Encrypter Access.app/Contents/MacOS/Disk Encrypter Access";
+			};
+			name = Release;
+		};
+		F526761DE25E53844A260061 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.macvfx.DiskEncrypterAccessTests;
+				SDKROOT = macosx;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Disk Encrypter Access.app/Contents/MacOS/Disk Encrypter Access";
+			};
+			name = Debug;
+		};
+		FB69F92E0C212DAD5BF7EA0C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				COMBINE_HIDPI_IMAGES = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "Disk Encrypter Access";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
+				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.macvfx.DiskEncrypterAccess;
+				PRODUCT_NAME = "Disk Encrypter Access";
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		18D8FF3E88697DD6BFF0F9B2 /* Build configuration list for PBXNativeTarget "Disk Encrypter AccessTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F526761DE25E53844A260061 /* Debug */,
+				8C6206B0D108E716746A99DD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		58EED7A981C7B67B0E2F4D02 /* Build configuration list for PBXProject "DiskEncrypterAccess" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				72C0E2CCED4505491FC9D521 /* Debug */,
+				0512D7F7CBFBE2923102ACF1 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		D74BA44AE7D770AA5DED1350 /* Build configuration list for PBXNativeTarget "Disk Encrypter Access" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4FA27A5DDC6498712BAFC5C4 /* Debug */,
+				FB69F92E0C212DAD5BF7EA0C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = C4C172C5BEAED97B022CABC2 /* Project object */;
+}

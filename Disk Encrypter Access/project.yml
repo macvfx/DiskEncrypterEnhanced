@@ -1,0 +1,41 @@
+name: DiskEncrypterAccess
+options:
+  bundleIdPrefix: com.macvfx
+  deploymentTarget:
+    macOS: "14.0"
+  createIntermediateGroups: true
+settings:
+  base:
+    SWIFT_VERSION: "5.0"
+    CODE_SIGN_STYLE: Automatic
+    CLANG_ENABLE_MODULES: YES
+targets:
+  Disk Encrypter Access:
+    type: application
+    platform: macOS
+    sources:
+      - path: App
+      - path: Core
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.macvfx.DiskEncrypterAccess
+        PRODUCT_NAME: Disk Encrypter Access
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_KEY_CFBundleDisplayName: Disk Encrypter Access
+        INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.utilities
+        INFOPLIST_KEY_NSPrincipalClass: NSApplication
+        ENABLE_HARDENED_RUNTIME: YES
+    scheme:
+      testTargets:
+        - Disk Encrypter AccessTests
+  Disk Encrypter AccessTests:
+    type: bundle.unit-test
+    platform: macOS
+    sources:
+      - path: Tests
+    dependencies:
+      - target: Disk Encrypter Access
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.macvfx.DiskEncrypterAccessTests
+        GENERATE_INFOPLIST_FILE: YES
