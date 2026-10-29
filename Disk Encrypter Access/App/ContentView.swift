@@ -4,19 +4,22 @@ struct ContentView: View {
     @ObservedObject var model: AccessModel
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 18) {
-            header
-            protectionNotice
-            if let active = model.activeException {
-                ActiveExceptionCard(active: active) {
-                    Task { await model.revokeException() }
+        ScrollView {
+            VStack(alignment: .leading, spacing: 18) {
+                header
+                protectionNotice
+                if let active = model.activeException {
+                    ActiveExceptionCard(active: active) {
+                        Task { await model.revokeException() }
+                    }
                 }
+                volumeSection
+                exceptionSection
+                footer
             }
-            volumeSection
-            exceptionSection
-            footer
+            .padding(24)
+            .frame(maxWidth: .infinity, alignment: .leading)
         }
-        .padding(24)
         .task { await model.refreshVolumes() }
         .task {
             while !Task.isCancelled {
@@ -126,6 +129,8 @@ struct ContentView: View {
             if let error = model.errorMessage {
                 Label(error, systemImage: "exclamationmark.triangle.fill")
                     .foregroundStyle(.red)
+                    .font(.callout)
+                    .textSelection(.enabled)
             }
 
             HStack {

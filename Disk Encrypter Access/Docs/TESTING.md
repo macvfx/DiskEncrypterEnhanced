@@ -119,9 +119,10 @@ sudo test ! -e /var/db/DiskEncrypter/active-exception.plist \
 The state plist is not installed with the app. The root helper creates it only after a valid exception request has been accepted.
 
 1. Select **Register Privileged Helper**.
-2. If the app reports that approval is required, open **System Settings > General > Login Items & Extensions** and approve Disk Encrypter Access.
-3. Return to the app and allow up to five seconds for status refresh.
-4. Verify the registered service:
+2. The first registration may return `Operation not permitted` while macOS creates a pending background item. The app must treat this as **Requires Approval**, not as a fatal registration error, and open **System Settings > General > Login Items & Extensions**.
+3. Approve Disk Encrypter Access in System Settings.
+4. Return to the app and allow up to five seconds for status refresh.
+5. Verify the registered service:
 
    ```bash
    sudo launchctl print system/com.macvfx.DiskEncrypterAccess.Helper

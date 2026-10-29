@@ -122,6 +122,9 @@ final class AccessModel: ObservableObject {
         do {
             try await service.register()
             helperStatus = await service.status()
+        } catch PrivilegedServiceError.approvalRequired {
+            helperStatus = .requiresApproval
+            await service.openApprovalSettings()
         } catch {
             errorMessage = error.localizedDescription
             helperStatus = await service.status()

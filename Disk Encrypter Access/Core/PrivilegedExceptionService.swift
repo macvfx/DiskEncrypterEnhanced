@@ -1,3 +1,4 @@
+import Darwin
 import Foundation
 import ServiceManagement
 
@@ -44,7 +45,7 @@ final class XPCPrivilegedExceptionService: PrivilegedExceptionServicing, @unchec
         do {
             try daemon.register()
         } catch {
-            throw PrivilegedServiceError.registrationFailed(error.localizedDescription)
+            throw Self.registrationError(from: error as NSError)
         }
     }
 
@@ -80,6 +81,20 @@ final class XPCPrivilegedExceptionService: PrivilegedExceptionServicing, @unchec
             return "The installed app is missing its bundled privileged helper executable. Recopy the complete app to /Applications."
         }
         return nil
+    }
+
+    static func registrationError(from error: NSError) -> PrivilegedServiceError {
+        let operationNotPermitted = error.code == Int(EPERM)
+        let serviceManagementPermission = error.domain == "SMAppServiceErrorDomain"
+            && operationNotPermitted
+        let posixPermission = error.domain == NSPOSIXErrorDomain
+            && operationNotPermitted
+        if serviceManagementPermission || posixPermission {
+            return .approvalRequired
+        }
+        return .registrationFailed(
+            "\(error.localizedDescription) [\(error.domain) code \(error.code)]"
+        )
     }
 
     private func call(
@@ -162,6 +177,7 @@ private final class ReplyOnce<Value>: @unchecked Sendable {
 }
 
 enum PrivilegedServiceError: LocalizedError {
+    case approvalRequired
     case registrationFailed(String)
     case connectionLost
     case helperFailed(String)
@@ -169,6 +185,8 @@ enum PrivilegedServiceError: LocalizedError {
 
     var errorDescription: String? {
         switch self {
+        case .approvalRequired:
+            "Administrator approval is required in System Settings > General > Login Items & Extensions."
         case .registrationFailed(let detail): "Could not register the privileged helper: \(detail)"
         case .connectionLost: "The privileged helper is not running or the connection was interrupted."
         case .helperFailed(let detail): detail

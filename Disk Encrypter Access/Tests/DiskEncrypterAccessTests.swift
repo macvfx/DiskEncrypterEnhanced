@@ -7,6 +7,31 @@ final class DiskEncrypterAccessTests: XCTestCase {
         XCTAssertFalse(AdminEligibility.containsAdminGroup([20, 61, 204], adminGroupID: 80))
     }
 
+    func testServiceManagementPermissionErrorRequiresApproval() {
+        let error = NSError(
+            domain: "SMAppServiceErrorDomain",
+            code: Int(EPERM),
+            userInfo: [NSLocalizedDescriptionKey: "Operation not permitted"]
+        )
+
+        guard case .approvalRequired = XPCPrivilegedExceptionService.registrationError(from: error) else {
+            return XCTFail("Service Management permission errors must enter the approval flow.")
+        }
+    }
+
+    func testRegistrationFailureIncludesDomainAndCode() {
+        let error = NSError(
+            domain: "ExampleRegistrationDomain",
+            code: 108,
+            userInfo: [NSLocalizedDescriptionKey: "Unable to read plist"]
+        )
+
+        guard case .registrationFailed(let detail) = XPCPrivilegedExceptionService.registrationError(from: error) else {
+            return XCTFail("Unexpected registration error mapping.")
+        }
+        XCTAssertTrue(detail.contains("ExampleRegistrationDomain code 108"))
+    }
+
     func testParsesMountedUnencryptedExternalVolume() throws {
         let info: [String: Any] = [
             "Internal": false,
