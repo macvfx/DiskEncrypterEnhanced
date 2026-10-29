@@ -1,8 +1,14 @@
 # DiskEncryption 2.0 "Enhanced"
 
-- **Version:** 2.4.5
-- **Date:** December 15, 2025
+- **Version:** 2.4.6
+- **Date:** October 29, 2026
 - **Compatibility:** macOS 15+ (Sequoia) and macOS 26+
+
+## What's New in 2.4.6
+- Adds fail-closed, time-limited UUID exceptions created by Disk Encrypter Access.
+- Keeps the global DiskEncrypter LaunchDaemon loaded while allowing one approved volume.
+- Accepts only root-owned mode `600` state with an active status and future expiry.
+- Ships as Munki-upgradable package receipt `com.custom.diskencrypter` version `2.4.6`.
 
 ## What's New in 2.4.5
 - **FIXED:** Password hints can now have spaces when encrypting
@@ -312,6 +318,11 @@ sudo /Library/Application\ Support/Custom/DiskEncrypter_Enhanced.sh --dry-run --
 - SwiftDialog (auto-downloaded if not present)
 
 ## Version History
+
+### v2.4.6 - October 29, 2026
+- **ADDED:** Protected, time-limited Volume UUID exceptions for Disk Encrypter Access.
+- **SECURITY:** Invalid, unsafe, mismatched or expired exception state fails closed to normal read-only enforcement.
+- **DEPLOYMENT:** Versioned Munki upgrade package using receipt `com.custom.diskencrypter` version `2.4.6`.
 
 ### Unreleased
 - **FIXED:** `uninstall_launchdaemon.sh` did nothing on Macs installed from the installer package. The package installs LaunchDaemon `com.custom.diskencrypter`, but the uninstaller only looked for `com.custom.diskencrypter.volumewatcher` (the `install_launchdaemon.sh` label), so the daemon stayed loaded after its script was deleted. It now handles both labels and removes the package receipt.

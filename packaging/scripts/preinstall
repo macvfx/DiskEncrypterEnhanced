@@ -1,0 +1,22 @@
+#!/bin/bash
+
+set -u
+
+label="com.custom.diskencrypter"
+state_file="/var/db/DiskEncrypter/active-exception.plist"
+
+# Never replace or unload enforcement while the helper is responsible for a
+# timed writable exception. Munki can retry after the exception has ended.
+if [[ -e "$state_file" ]]; then
+    echo "DiskEncrypter 2.4.6 update deferred: an exception state file is present." >&2
+    exit 75
+fi
+
+if /bin/launchctl print "system/$label" >/dev/null 2>&1; then
+    if ! /bin/launchctl bootout "system/$label"; then
+        echo "Could not stop $label before update." >&2
+        exit 1
+    fi
+fi
+
+exit 0

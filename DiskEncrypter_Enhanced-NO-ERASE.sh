@@ -24,6 +24,8 @@
 #                    -  Fixed in Managed Preferences 2nd fix and installer makers
 #                     - Changed hintRegex from "^[^\s]{6,}$" to "^.{6,}$"
 #                     - Updated hint error message for clarity
+# v2.4.6 - 10/29/2026 - Added protected, time-limited UUID exceptions for
+#                     - Disk Encrypter Access without unloading global protection
 
 ## Managed Preferences
 settingsPlist="/Library/Managed Preferences/com.custom.diskencrypter.plist"
@@ -1059,7 +1061,7 @@ main() {
 
     log_info "========================================="
     log_info "DiskEncrypter Script Starting"
-    log_info "Version: 2.4.5 (Password & Hint Spaces Fix)"
+    log_info "Version: 2.4.6 (Timed UUID Exceptions)"
     log_info "========================================="
     log_info "DRY RUN MODE: $DRY_RUN (source: $dryRunSource)"
     log_info "LOG LEVEL: $LOG_LEVEL (source: $logLevelSource)"

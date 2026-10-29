@@ -1,0 +1,27 @@
+#!/bin/bash
+
+set -u
+
+version="2.4.6"
+label="com.custom.diskencrypter"
+script_path="/Library/Application Support/Custom/DiskEncrypter_Enhanced.sh"
+plist_path="/Library/LaunchDaemons/com.custom.diskencrypter.plist"
+
+/usr/sbin/chown root:wheel "$script_path" "$plist_path"
+/bin/chmod 755 "$script_path"
+/bin/chmod 644 "$plist_path"
+
+if ! /usr/bin/plutil -lint "$plist_path" >/dev/null; then
+    echo "Installed LaunchDaemon plist is invalid." >&2
+    exit 1
+fi
+
+if ! /bin/launchctl bootstrap system "$plist_path"; then
+    echo "Could not bootstrap $label after update." >&2
+    exit 1
+fi
+
+/bin/launchctl kickstart -k "system/$label"
+echo "$(/bin/date): DiskEncrypter Enhanced v${version} installed successfully" >> /var/log/diskencrypter.log
+
+exit 0
