@@ -17,25 +17,18 @@ targets:
       - path: App
       - path: Core
       - path: Helper/ProtectedExceptionStore.swift
+      - path: Resources/com.macvfx.DiskEncrypterAccess.Helper.plist
+        buildPhase:
+          copyFiles:
+            destination: wrapper
+            subpath: Contents/Library/LaunchDaemons
     dependencies:
       - target: Disk Encrypter Access Helper
-    postBuildScripts:
-      - name: Embed privileged helper
-        script: |
-          set -euo pipefail
-          APP_CONTENTS="${TARGET_BUILD_DIR}/${CONTENTS_FOLDER_PATH}"
-          HELPER_DIR="${APP_CONTENTS}/Library/LaunchServices"
-          PLIST_DIR="${APP_CONTENTS}/Library/LaunchDaemons"
-          /bin/mkdir -p "${HELPER_DIR}" "${PLIST_DIR}"
-          /usr/bin/ditto "${BUILT_PRODUCTS_DIR}/com.macvfx.DiskEncrypterAccess.Helper" "${HELPER_DIR}/com.macvfx.DiskEncrypterAccess.Helper"
-          /bin/chmod 755 "${HELPER_DIR}/com.macvfx.DiskEncrypterAccess.Helper"
-          /usr/bin/ditto "${SRCROOT}/Resources/com.macvfx.DiskEncrypterAccess.Helper.plist" "${PLIST_DIR}/com.macvfx.DiskEncrypterAccess.Helper.plist"
-        inputFiles:
-          - $(BUILT_PRODUCTS_DIR)/com.macvfx.DiskEncrypterAccess.Helper
-          - $(SRCROOT)/Resources/com.macvfx.DiskEncrypterAccess.Helper.plist
-        outputFiles:
-          - $(TARGET_BUILD_DIR)/$(CONTENTS_FOLDER_PATH)/Library/LaunchServices/com.macvfx.DiskEncrypterAccess.Helper
-          - $(TARGET_BUILD_DIR)/$(CONTENTS_FOLDER_PATH)/Library/LaunchDaemons/com.macvfx.DiskEncrypterAccess.Helper.plist
+        embed: true
+        codeSign: true
+        copy:
+          destination: wrapper
+          subpath: Contents/Library/LaunchServices
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.macvfx.DiskEncrypterAccess
