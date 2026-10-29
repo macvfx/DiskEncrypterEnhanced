@@ -40,10 +40,13 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.macvfx.DiskEncrypterAccess
         PRODUCT_NAME: Disk Encrypter Access
+        MARKETING_VERSION: 0.1.0
+        CURRENT_PROJECT_VERSION: 1
         GENERATE_INFOPLIST_FILE: YES
         INFOPLIST_KEY_CFBundleDisplayName: Disk Encrypter Access
         INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.utilities
         INFOPLIST_KEY_NSPrincipalClass: NSApplication
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         ENABLE_HARDENED_RUNTIME: YES
         ENABLE_USER_SCRIPT_SANDBOXING: NO
     scheme:
@@ -64,6 +67,8 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.macvfx.DiskEncrypterAccess.Helper
         PRODUCT_NAME: com.macvfx.DiskEncrypterAccess.Helper
+        MARKETING_VERSION: 0.1.0
+        CURRENT_PROJECT_VERSION: 1
         ENABLE_HARDENED_RUNTIME: YES
         SKIP_INSTALL: YES
   Disk Encrypter AccessTests:

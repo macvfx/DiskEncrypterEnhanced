@@ -26,6 +26,7 @@
 		84D4580AE3B0DDFA8A9F72A2 /* ExceptionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC8E5790AE148CC2C0BC8BF0 /* ExceptionManager.swift */; };
 		91C530AE6C3918F0D6F0C154 /* HelperXPCProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 89DA205DA1F5964603AD1CB6 /* HelperXPCProtocol.swift */; };
 		9684DAFB3F9AD4F4D653EE9E /* PrivilegedExceptionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E18E624E0A085FC0AF62D290 /* PrivilegedExceptionService.swift */; };
+		9791CB1B9EC2AEEAA18270D3 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D510A4FC2A081C5C15D8F065 /* Assets.xcassets */; };
 		9FF03F79350E0E5137BF6313 /* ExceptionModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81C8C02EE6DC0D8CCD7D46B7 /* ExceptionModels.swift */; };
 		A7FDABDF1789C12E4D46EEE0 /* HelperXPCProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 89DA205DA1F5964603AD1CB6 /* HelperXPCProtocol.swift */; };
 		AD3A38ED909D145164B3BF23 /* AdminEligibility.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9194E6814D3DCB88008874B8 /* AdminEligibility.swift */; };
@@ -73,6 +74,7 @@
 		BC671AF0C83935F281B64F34 /* ExternalVolume.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExternalVolume.swift; sourceTree = "<group>"; };
 		BC8E5790AE148CC2C0BC8BF0 /* ExceptionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExceptionManager.swift; sourceTree = "<group>"; };
 		D1FC5C413AD6D5CB3D35FFEE /* Disk Encrypter Access Helper */ = {isa = PBXFileReference; includeInIndex = 0; path = "Disk Encrypter Access Helper"; sourceTree = BUILT_PRODUCTS_DIR; };
+		D510A4FC2A081C5C15D8F065 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		E18E624E0A085FC0AF62D290 /* PrivilegedExceptionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivilegedExceptionService.swift; sourceTree = "<group>"; };
 		F038714D8F552ECB7B13D11D /* ExceptionManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExceptionManagerTests.swift; sourceTree = "<group>"; };
 		F843704D89CF542C9B41D952 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -148,6 +150,7 @@
 		FDC25A37AD6F5CBFB607146A /* App */ = {
 			isa = PBXGroup;
 			children = (
+				D510A4FC2A081C5C15D8F065 /* Assets.xcassets */,
 				F843704D89CF542C9B41D952 /* ContentView.swift */,
 				B76A40EFC3C64C883F3B76BF /* DiskEncrypterAccessApp.swift */,
 			);
@@ -279,6 +282,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9791CB1B9EC2AEEAA18270D3 /* Assets.xcassets in Resources */,
 				C1E1C8EB9ACAA7BD9822FDCB /* Disk Encrypter Access Helper in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -445,11 +449,13 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_HARDENED_RUNTIME = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
+				MARKETING_VERSION = 0.1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.macvfx.DiskEncrypterAccess.Helper;
 				PRODUCT_NAME = com.macvfx.DiskEncrypterAccess.Helper;
 				SDKROOT = macosx;
@@ -462,6 +468,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -472,6 +479,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
+				MARKETING_VERSION = 0.1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.macvfx.DiskEncrypterAccess;
 				PRODUCT_NAME = "Disk Encrypter Access";
 				SDKROOT = macosx;
@@ -578,11 +586,13 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_HARDENED_RUNTIME = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
+				MARKETING_VERSION = 0.1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.macvfx.DiskEncrypterAccess.Helper;
 				PRODUCT_NAME = com.macvfx.DiskEncrypterAccess.Helper;
 				SDKROOT = macosx;
@@ -629,6 +639,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -639,6 +650,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
+				MARKETING_VERSION = 0.1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.macvfx.DiskEncrypterAccess;
 				PRODUCT_NAME = "Disk Encrypter Access";
 				SDKROOT = macosx;
