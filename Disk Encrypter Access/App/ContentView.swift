@@ -2,6 +2,7 @@ import SwiftUI
 
 struct ContentView: View {
     @ObservedObject var model: AccessModel
+    @Environment(\.openWindow) private var openWindow
 
     var body: some View {
         ScrollView {
@@ -61,6 +62,11 @@ struct ContentView: View {
                     .foregroundStyle(.secondary)
             }
             Spacer()
+            Button {
+                openWindow(id: AppWindowID.history)
+            } label: {
+                Label("History", systemImage: "clock.arrow.circlepath")
+            }
         }
     }
 

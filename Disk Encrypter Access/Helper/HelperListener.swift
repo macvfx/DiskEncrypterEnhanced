@@ -39,6 +39,10 @@ private final class HelperEndpoint: NSObject, DiskEncrypterAccessHelperXPC {
         manager.snapshot { result in Self.reply(result, to: reply) }
     }
 
+    func auditHistory(limit: Int, reply: @escaping (Data?, String?) -> Void) {
+        manager.auditHistory(limit: limit) { result in Self.reply(result, to: reply) }
+    }
+
     func begin(requestData: Data, reply: @escaping (Data?, String?) -> Void) {
         do {
             let request = try Self.decoder.decode(ExceptionRequest.self, from: requestData)
@@ -56,8 +60,8 @@ private final class HelperEndpoint: NSObject, DiskEncrypterAccessHelperXPC {
         manager.revoke(requestID: id, caller: caller) { result in Self.reply(result, to: reply) }
     }
 
-    private static func reply(
-        _ result: Result<HelperSnapshot, Error>,
+    private static func reply<Value: Encodable>(
+        _ result: Result<Value, Error>,
         to callback: @escaping (Data?, String?) -> Void
     ) {
         switch result {

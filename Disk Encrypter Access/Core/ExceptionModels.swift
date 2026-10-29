@@ -85,7 +85,7 @@ enum ExceptionValidationError: LocalizedError {
     }
 }
 
-enum ExceptionAuditAction: String, Codable, Sendable {
+enum ExceptionAuditAction: String, Codable, Equatable, Sendable {
     case requested
     case granted
     case revoked
@@ -95,7 +95,7 @@ enum ExceptionAuditAction: String, Codable, Sendable {
     case failed
 }
 
-struct ExceptionAuditEvent: Codable, Sendable {
+struct ExceptionAuditEvent: Codable, Equatable, Sendable {
     let eventID: UUID
     let requestID: UUID
     let timestamp: Date

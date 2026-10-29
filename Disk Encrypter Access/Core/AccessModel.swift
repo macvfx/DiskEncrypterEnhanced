@@ -17,6 +17,9 @@ final class AccessModel: ObservableObject {
     @Published private(set) var errorMessage: String?
     @Published private(set) var helperStatus: HelperStatus = .notInstalled
     @Published private(set) var activeException: ActiveException?
+    @Published private(set) var auditEvents: [ExceptionAuditEvent] = []
+    @Published private(set) var isLoadingHistory = false
+    @Published private(set) var historyError: String?
     let currentUserIsAdmin: Bool
 
     private let discovery: DiskutilVolumeDiscovery
@@ -151,6 +154,23 @@ final class AccessModel: ObservableObject {
 
     func openApprovalSettings() async {
         await service.openApprovalSettings()
+    }
+
+    func loadAuditHistory() async {
+        helperStatus = await service.status()
+        guard helperStatus == .ready else {
+            auditEvents = []
+            historyError = "The privileged helper must be registered and approved to read protected history."
+            return
+        }
+        isLoadingHistory = true
+        historyError = nil
+        defer { isLoadingHistory = false }
+        do {
+            auditEvents = try await service.auditHistory(limit: 500)
+        } catch {
+            historyError = error.localizedDescription
+        }
     }
 
     func revokeException() async {

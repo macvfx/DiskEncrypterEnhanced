@@ -163,4 +163,48 @@ final class DiskEncrypterAccessTests: XCTestCase {
         ).intValue & 0o777
         XCTAssertEqual(auditMode, 0o600)
     }
+
+    func testHistoryGroupsEventsByRequestAndSortsNewestFirst() {
+        let olderID = UUID()
+        let newerID = UUID()
+        let base = Date(timeIntervalSince1970: 1_700_000_000)
+        let events = [
+            auditEvent(requestID: olderID, timestamp: base, action: .requested, volumeName: "Example Media"),
+            auditEvent(requestID: newerID, timestamp: base.addingTimeInterval(60), action: .requested, volumeName: "Example Archive"),
+            auditEvent(requestID: olderID, timestamp: base.addingTimeInterval(10), action: .expired, volumeName: "Example Media"),
+            auditEvent(requestID: newerID, timestamp: base.addingTimeInterval(70), action: .revoked, volumeName: "Example Archive"),
+        ]
+
+        let records = ExceptionHistoryRecord.records(from: events)
+
+        XCTAssertEqual(records.map(\.id), [newerID, olderID])
+        XCTAssertEqual(records[0].action, .revoked)
+        XCTAssertEqual(records[0].events.map(\.action), [.requested, .revoked])
+        XCTAssertEqual(records[1].action, .expired)
+    }
+
+    private func auditEvent(
+        requestID: UUID,
+        timestamp: Date,
+        action: ExceptionAuditAction,
+        volumeName: String
+    ) -> ExceptionAuditEvent {
+        ExceptionAuditEvent(
+            eventID: UUID(),
+            requestID: requestID,
+            timestamp: timestamp,
+            action: action,
+            volumeUUID: "11111111-2222-3333-4444-555555555555",
+            volumeName: volumeName,
+            bsdName: "disk8s1",
+            fileSystem: "ExFAT",
+            durationMinutes: 15,
+            expiresAt: timestamp.addingTimeInterval(900),
+            cameraMediaStructureDetected: false,
+            requestedBy: "example-admin",
+            requestingUID: 501,
+            note: "Export approved deliverables",
+            detail: "Example audit detail."
+        )
+    }
 }

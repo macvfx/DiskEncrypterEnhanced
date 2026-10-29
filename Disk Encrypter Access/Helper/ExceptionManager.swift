@@ -51,6 +51,15 @@ final class ExceptionManager: @unchecked Sendable {
         }
     }
 
+    func auditHistory(
+        limit: Int,
+        reply: @escaping (Result<[ExceptionAuditEvent], Error>) -> Void
+    ) {
+        queue.async {
+            reply(Result { try self.audit.readRecent(limit: limit) })
+        }
+    }
+
     func begin(
         request: ExceptionRequest,
         caller: AuthenticatedCaller,

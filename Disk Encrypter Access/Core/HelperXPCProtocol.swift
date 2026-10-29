@@ -10,6 +10,7 @@ enum HelperConstants {
 
 @objc protocol DiskEncrypterAccessHelperXPC {
     func snapshot(reply: @escaping (Data?, String?) -> Void)
+    func auditHistory(limit: Int, reply: @escaping (Data?, String?) -> Void)
     func begin(requestData: Data, reply: @escaping (Data?, String?) -> Void)
     func revoke(requestID: String, reply: @escaping (Data?, String?) -> Void)
 }

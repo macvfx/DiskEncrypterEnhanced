@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		015E742618FA3CC8B79BAFAD /* ExceptionHistory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A472A5B4D54E1966A7D33EA /* ExceptionHistory.swift */; };
 		0F39A57E61352FB759D5C2A3 /* CameraMediaDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 627E6A7D3627DE0372B85F39 /* CameraMediaDetector.swift */; };
 		110C9D70B790A130EC145DD7 /* DiskEncrypterAccessTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7792500A02338BFF89361819 /* DiskEncrypterAccessTests.swift */; };
 		15396785292CC42C61D02BCA /* ExternalVolume.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC671AF0C83935F281B64F34 /* ExternalVolume.swift */; };
@@ -24,6 +25,7 @@
 		68DF8F9AF836963556A0F80E /* AdminEligibility.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9194E6814D3DCB88008874B8 /* AdminEligibility.swift */; };
 		6AB5D4992A307C7198F153F4 /* ProtectedExceptionStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D7E84977ABE9259A0388A1B /* ProtectedExceptionStore.swift */; };
 		6F5B4BE5DE0621A73A9B49C9 /* ExceptionModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81C8C02EE6DC0D8CCD7D46B7 /* ExceptionModels.swift */; };
+		79C17C673C7B9452B52E9841 /* SupportViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0C06175A8BDEE3DEAF346A1 /* SupportViews.swift */; };
 		7C937EC9F119290D91E0D613 /* HelperListener.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD238642DE161EFB07BD8AD5 /* HelperListener.swift */; };
 		84D4580AE3B0DDFA8A9F72A2 /* ExceptionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC8E5790AE148CC2C0BC8BF0 /* ExceptionManager.swift */; };
 		91C530AE6C3918F0D6F0C154 /* HelperXPCProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 89DA205DA1F5964603AD1CB6 /* HelperXPCProtocol.swift */; };
@@ -98,10 +100,12 @@
 		89BFF3BD7680FE856A22EF94 /* Disk Encrypter AccessTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Disk Encrypter AccessTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		89DA205DA1F5964603AD1CB6 /* HelperXPCProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelperXPCProtocol.swift; sourceTree = "<group>"; };
 		9194E6814D3DCB88008874B8 /* AdminEligibility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdminEligibility.swift; sourceTree = "<group>"; };
+		9A472A5B4D54E1966A7D33EA /* ExceptionHistory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExceptionHistory.swift; sourceTree = "<group>"; };
 		B76A40EFC3C64C883F3B76BF /* DiskEncrypterAccessApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiskEncrypterAccessApp.swift; sourceTree = "<group>"; };
 		BB27DF4BBE68D4F68DCD4DB9 /* DiskutilVolumeDiscovery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiskutilVolumeDiscovery.swift; sourceTree = "<group>"; };
 		BC671AF0C83935F281B64F34 /* ExternalVolume.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExternalVolume.swift; sourceTree = "<group>"; };
 		BC8E5790AE148CC2C0BC8BF0 /* ExceptionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExceptionManager.swift; sourceTree = "<group>"; };
+		C0C06175A8BDEE3DEAF346A1 /* SupportViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupportViews.swift; sourceTree = "<group>"; };
 		D1FC5C413AD6D5CB3D35FFEE /* Disk Encrypter Access Helper */ = {isa = PBXFileReference; includeInIndex = 0; path = "Disk Encrypter Access Helper"; sourceTree = BUILT_PRODUCTS_DIR; };
 		D510A4FC2A081C5C15D8F065 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		E18E624E0A085FC0AF62D290 /* PrivilegedExceptionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivilegedExceptionService.swift; sourceTree = "<group>"; };
@@ -154,6 +158,7 @@
 				3FD50934286BF5FBC60171F2 /* AccessModel.swift */,
 				9194E6814D3DCB88008874B8 /* AdminEligibility.swift */,
 				BB27DF4BBE68D4F68DCD4DB9 /* DiskutilVolumeDiscovery.swift */,
+				9A472A5B4D54E1966A7D33EA /* ExceptionHistory.swift */,
 				81C8C02EE6DC0D8CCD7D46B7 /* ExceptionModels.swift */,
 				BC671AF0C83935F281B64F34 /* ExternalVolume.swift */,
 				89DA205DA1F5964603AD1CB6 /* HelperXPCProtocol.swift */,
@@ -192,6 +197,7 @@
 				D510A4FC2A081C5C15D8F065 /* Assets.xcassets */,
 				F843704D89CF542C9B41D952 /* ContentView.swift */,
 				B76A40EFC3C64C883F3B76BF /* DiskEncrypterAccessApp.swift */,
+				C0C06175A8BDEE3DEAF346A1 /* SupportViews.swift */,
 			);
 			path = App;
 			sourceTree = "<group>";
@@ -364,11 +370,13 @@
 				2ACCE885B7B109C8D725BAC5 /* ContentView.swift in Sources */,
 				D4D5E59CD2AE6B6A7AA70C5B /* DiskEncrypterAccessApp.swift in Sources */,
 				DCF83D878B857285ABB3CC11 /* DiskutilVolumeDiscovery.swift in Sources */,
+				015E742618FA3CC8B79BAFAD /* ExceptionHistory.swift in Sources */,
 				DCE2AFBE4F7CB79617C607AC /* ExceptionModels.swift in Sources */,
 				15396785292CC42C61D02BCA /* ExternalVolume.swift in Sources */,
 				66D5AEAE573B417DB09351FE /* HelperXPCProtocol.swift in Sources */,
 				9684DAFB3F9AD4F4D653EE9E /* PrivilegedExceptionService.swift in Sources */,
 				3E76052D1B255514244832D7 /* ProtectedExceptionStore.swift in Sources */,
+				79C17C673C7B9452B52E9841 /* SupportViews.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -465,7 +473,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 7;
+				CURRENT_PROJECT_VERSION = 8;
 				ENABLE_HARDENED_RUNTIME = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -484,7 +492,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 7;
+				CURRENT_PROJECT_VERSION = 8;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -602,7 +610,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 7;
+				CURRENT_PROJECT_VERSION = 8;
 				ENABLE_HARDENED_RUNTIME = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -655,7 +663,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 7;
+				CURRENT_PROJECT_VERSION = 8;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;

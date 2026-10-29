@@ -83,6 +83,7 @@ enum ProtectedStoreError: LocalizedError {
 }
 
 struct ProtectedAuditLog: Sendable {
+    private static let maximumHistoryReadBytes: UInt64 = 2 * 1_024 * 1_024
     let paths: ExceptionStoragePaths
 
     init(paths: ExceptionStoragePaths = .live) {
@@ -125,6 +126,30 @@ struct ProtectedAuditLog: Sendable {
             protectedAttributes(permissions: 0o600),
             ofItemAtPath: paths.auditURL.path
         )
+    }
+
+    func readRecent(limit: Int) throws -> [ExceptionAuditEvent] {
+        let boundedLimit = min(max(limit, 1), 1_000)
+        guard FileManager.default.fileExists(atPath: paths.auditURL.path) else { return [] }
+
+        let handle = try FileHandle(forReadingFrom: paths.auditURL)
+        defer { try? handle.close() }
+        let size = try handle.seekToEnd()
+        let start = size > Self.maximumHistoryReadBytes
+            ? size - Self.maximumHistoryReadBytes
+            : 0
+        try handle.seek(toOffset: start)
+        guard var data = try handle.readToEnd(), !data.isEmpty else { return [] }
+
+        if start > 0, let firstNewline = data.firstIndex(of: 0x0A) {
+            data.removeSubrange(data.startIndex...firstNewline)
+        }
+
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .iso8601
+        return data.split(separator: 0x0A, omittingEmptySubsequences: true)
+            .suffix(boundedLimit)
+            .compactMap { try? decoder.decode(ExceptionAuditEvent.self, from: Data($0)) }
     }
 
     private func protectedAttributes(permissions: NSNumber) -> [FileAttributeKey: Any] {

@@ -19,6 +19,12 @@ The bundled helper:
 7. remount only the selected volume normally after the protected exception record exists; and
 8. expire or revoke the exception even when the app is closed, asleep, relaunched, or rebooted.
 
+## Protected history reads
+
+The audit log remains root-owned with mode `0600`; the GUI does not read it directly. The already authenticated privileged XPC helper exposes a read-only history request to the signed app for an administrator caller. The helper caps each response to 1,000 recent events and reads at most the trailing 2 MiB of the JSONL file. The app groups those events by request UUID for display while preserving the original event sequence and detail.
+
+History access never changes exception state, disk mounts, log ownership, or log contents. If the helper is not registered and approved, the history window explains that protected history is unavailable.
+
 DiskEncrypter will read only the root-owned active-exception property list and skip a volume only when its Volume UUID matches and the absolute expiration time is still in the future.
 
 ## Expiration safety

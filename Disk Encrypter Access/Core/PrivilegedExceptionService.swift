@@ -14,6 +14,7 @@ protocol PrivilegedExceptionServicing: Sendable {
     func register() async throws
     func openApprovalSettings() async
     func snapshot() async throws -> HelperSnapshot
+    func auditHistory(limit: Int) async throws -> [ExceptionAuditEvent]
     func begin(_ request: ExceptionRequest) async throws -> HelperSnapshot
     func revoke(requestID: UUID) async throws -> HelperSnapshot
 }
@@ -57,6 +58,10 @@ final class XPCPrivilegedExceptionService: PrivilegedExceptionServicing, @unchec
         try await call { proxy, reply in proxy.snapshot(reply: reply) }
     }
 
+    func auditHistory(limit: Int = 500) async throws -> [ExceptionAuditEvent] {
+        try await call { proxy, reply in proxy.auditHistory(limit: limit, reply: reply) }
+    }
+
     func begin(_ request: ExceptionRequest) async throws -> HelperSnapshot {
         let data = try Self.encoder.encode(request)
         return try await call { proxy, reply in proxy.begin(requestData: data, reply: reply) }
@@ -97,11 +102,11 @@ final class XPCPrivilegedExceptionService: PrivilegedExceptionServicing, @unchec
         )
     }
 
-    private func call(
+    private func call<Value: Decodable>(
         _ operation: @escaping (DiskEncrypterAccessHelperXPC, @escaping (Data?, String?) -> Void) -> Void
-    ) async throws -> HelperSnapshot {
+    ) async throws -> Value {
         try await withCheckedThrowingContinuation { continuation in
-            let once = ReplyOnce<HelperSnapshot>(continuation)
+            let once = ReplyOnce<Value>(continuation)
             let connection = NSXPCConnection(
                 machServiceName: HelperConstants.machServiceName,
                 options: .privileged
@@ -135,7 +140,7 @@ final class XPCPrivilegedExceptionService: PrivilegedExceptionServicing, @unchec
                     return
                 }
                 do {
-                    once.resume(.success(try Self.decoder.decode(HelperSnapshot.self, from: data)))
+                    once.resume(.success(try Self.decoder.decode(Value.self, from: data)))
                 } catch {
                     once.resume(.failure(PrivilegedServiceError.invalidReply))
                 }

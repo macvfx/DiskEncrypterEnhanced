@@ -24,5 +24,23 @@ struct DiskEncrypterAccessApp: App {
         }
         .defaultSize(width: 720, height: 680)
         .windowResizability(.contentMinSize)
+        .commands {
+            DiskEncrypterAccessCommands()
+        }
+
+        Window("Exception History", id: AppWindowID.history) {
+            ExceptionHistoryView(model: model)
+        }
+        .defaultSize(width: 840, height: 580)
+
+        Window("Disk Encrypter Access Help", id: AppWindowID.help) {
+            HelpView()
+        }
+        .defaultSize(width: 680, height: 620)
+
+        Window("About Disk Encrypter Access", id: AppWindowID.about) {
+            AboutView()
+        }
+        .windowResizability(.contentSize)
     }
 }

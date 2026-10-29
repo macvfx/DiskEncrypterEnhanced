@@ -191,6 +191,42 @@ final class ExceptionManagerTests: XCTestCase {
         XCTAssertTrue(try String(contentsOf: paths.auditURL, encoding: .utf8)
             .contains("\"action\":\"expirationPending\""))
     }
+
+    func testProtectedAuditHistoryReturnsMostRecentBoundedEvents() throws {
+        let root = FileManager.default.temporaryDirectory
+            .appendingPathComponent("AuditHistoryTests-\(UUID().uuidString)", isDirectory: true)
+        defer { try? FileManager.default.removeItem(at: root) }
+        let paths = ExceptionStoragePaths(
+            stateURL: root.appendingPathComponent("state/active-exception.plist"),
+            auditURL: root.appendingPathComponent("logs/exceptions.jsonl")
+        )
+        let audit = ProtectedAuditLog(paths: paths)
+        let requestID = UUID()
+        let base = Date(timeIntervalSince1970: 1_700_000_000)
+
+        for (offset, action) in [ExceptionAuditAction.requested, .granted, .revoked].enumerated() {
+            try audit.append(ExceptionAuditEvent(
+                eventID: UUID(),
+                requestID: requestID,
+                timestamp: base.addingTimeInterval(TimeInterval(offset)),
+                action: action,
+                volumeUUID: "11111111-2222-3333-4444-555555555555",
+                volumeName: "Example Media",
+                bsdName: "disk8s1",
+                fileSystem: "ExFAT",
+                durationMinutes: 15,
+                expiresAt: base.addingTimeInterval(900),
+                cameraMediaStructureDetected: false,
+                requestedBy: "example-admin",
+                requestingUID: 501,
+                note: "Export approved deliverables",
+                detail: "Example audit detail."
+            ))
+        }
+
+        let recent = try audit.readRecent(limit: 2)
+        XCTAssertEqual(recent.map(\.action), [.granted, .revoked])
+    }
 }
 
 private final class RecordingDiskutilRunner: CommandRunning, @unchecked Sendable {

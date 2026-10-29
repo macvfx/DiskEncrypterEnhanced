@@ -297,6 +297,24 @@ On a separate standard account:
 - The user must not be able to register the helper or begin an exception.
 - A direct XPC request from a non-admin process must be rejected by the helper.
 
+## 13. History, Help, and About
+
+After completing at least one timed exception:
+
+1. Select the **History** button in the main window, then repeat using **History > Show Exception History**.
+2. Confirm the exception appears once with its final state and a chronological event timeline.
+3. Confirm the detail view shows the expected fictional test volume name, UUID, filesystem, duration, requester, reason, scheduled expiry, and camera-media result.
+4. Compare the displayed actions with `sudo tail -n 10 /Library/Logs/DiskEncrypter/exceptions.jsonl`.
+5. Select **Help > Disk Encrypter Access Help** and confirm the current workflow and safety guidance are readable without resizing the window.
+6. Select **Disk Encrypter Access > About Disk Encrypter Access** and confirm the displayed version and build match the installed application.
+
+Expected:
+
+- History reads through the approved helper; the protected log remains `root:wheel` mode `600` and is not modified.
+- Multiple events for one request are grouped into one exception record.
+- Refreshing history does not alter the active exception, disk mount, or audit file.
+- Help and About open as separate standard macOS windows.
+
 ## Failure hold and recovery
 
 If a volume remains writable unexpectedly:
@@ -335,5 +353,6 @@ If a volume remains writable unexpectedly:
 | Sleep/wake | | | |
 | Reboot | | | |
 | Standard-user rejection | | | |
+| History, Help, and About | | | |
 
 Do not mark the build accepted until all required cases have inspectable evidence. Helper registration, early revocation, automatic expiry, and one-volume isolation are release blockers.

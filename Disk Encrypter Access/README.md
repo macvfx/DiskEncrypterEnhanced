@@ -11,8 +11,10 @@ Disk Encrypter Access is a small SwiftUI macOS administrator tool for granting o
 - Accepts XPC clients only when the running app has the expected bundle identifier, a valid signature, and the same Team ID as the helper.
 - Stores active state at `/var/db/DiskEncrypter/active-exception.plist` with root ownership and mode `0600`.
 - Appends JSONL audit events to `/Library/Logs/DiskEncrypter/exceptions.jsonl` with root ownership and mode `0600`.
+- Presents protected audit events as grouped exceptions in an administrator-only **Exception History** window without weakening log permissions.
 - Restores read-only protection at expiry or early revocation. A busy disk becomes visibly `expirationPending`; the helper never force-unmounts it and uses bounded rapid retries followed by five-minute retry intervals.
 - Reconciles persisted state after helper restart, app exit, sleep/wake, or reboot.
+- Includes standard macOS About and Help windows describing current controls, safety behavior, history, and troubleshooting.
 
 The existing DiskEncrypter scripts consult the protected state and skip enforcement only when the mounted volume UUID matches an unexpired `activating` or `active` exception.
 
