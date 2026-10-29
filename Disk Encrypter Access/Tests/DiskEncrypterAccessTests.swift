@@ -55,17 +55,72 @@ final class DiskEncrypterAccessTests: XCTestCase {
             size: 64_000_000_000,
             isReadOnly: true
         )
-        let now = Date(timeIntervalSince1970: 1_700_000_000)
         let request = try ExceptionRequest(
             volume: volume,
             duration: .fifteenMinutes,
-            note: "  Export approved deliverables  ",
-            now: now,
-            user: "example-admin"
+            note: "  Export approved deliverables  "
         )
 
         XCTAssertEqual(request.note, "Export approved deliverables")
-        XCTAssertEqual(request.expiresAt.timeIntervalSince(now), 900)
+        XCTAssertEqual(request.durationMinutes, 15)
         XCTAssertThrowsError(try ExceptionRequest(volume: volume, duration: .fiveMinutes, note: ""))
+    }
+
+    func testProtectedStateAndAuditRoundTrip() throws {
+        let root = FileManager.default.temporaryDirectory
+            .appendingPathComponent("DiskEncrypterAccessTests-\(UUID().uuidString)", isDirectory: true)
+        defer { try? FileManager.default.removeItem(at: root) }
+        let paths = ExceptionStoragePaths(
+            stateURL: root.appendingPathComponent("state/active-exception.plist"),
+            auditURL: root.appendingPathComponent("logs/exceptions.jsonl")
+        )
+        let store = ProtectedExceptionStore(paths: paths)
+        let audit = ProtectedAuditLog(paths: paths)
+        let started = Date(timeIntervalSince1970: 1_700_000_000)
+        let active = ActiveException(
+            requestID: UUID(),
+            volumeUUID: "11111111-2222-3333-4444-555555555555",
+            bsdName: "disk8s1",
+            volumeName: "Example Media",
+            fileSystem: "ExFAT",
+            note: "Export approved deliverables",
+            requestedBy: "example-admin",
+            requestingUID: 501,
+            startedAt: started,
+            expiresAt: started.addingTimeInterval(900),
+            expiresAtEpoch: 1_700_000_900,
+            status: .active,
+            retryCount: 0,
+            lastRetryAt: nil,
+            lastError: nil
+        )
+
+        try store.write(active)
+        XCTAssertEqual(try store.read(), active)
+        let stateMode = try XCTUnwrap(
+            FileManager.default.attributesOfItem(atPath: paths.stateURL.path)[.posixPermissions] as? NSNumber
+        ).intValue & 0o777
+        XCTAssertEqual(stateMode, 0o600)
+
+        try audit.append(ExceptionAuditEvent(
+            eventID: UUID(),
+            requestID: active.requestID,
+            timestamp: started,
+            action: .granted,
+            volumeUUID: active.volumeUUID,
+            volumeName: active.volumeName,
+            requestedBy: active.requestedBy,
+            requestingUID: active.requestingUID,
+            note: active.note,
+            detail: "Selected volume remounted writable."
+        ))
+        let lines = try String(contentsOf: paths.auditURL, encoding: .utf8)
+            .split(separator: "\n")
+        XCTAssertEqual(lines.count, 1)
+        XCTAssertTrue(lines[0].contains("\"action\":\"granted\""))
+        let auditMode = try XCTUnwrap(
+            FileManager.default.attributesOfItem(atPath: paths.auditURL.path)[.posixPermissions] as? NSNumber
+        ).intValue & 0o777
+        XCTAssertEqual(auditMode, 0o600)
     }
 }

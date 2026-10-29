@@ -18,11 +18,9 @@ struct ExceptionRequest: Codable, Equatable, Sendable {
     let volumeName: String
     let fileSystem: String
     let note: String
-    let requestedBy: String
-    let requestedAt: Date
-    let expiresAt: Date
+    let durationMinutes: Int
 
-    init(volume: ExternalVolume, duration: ExceptionDuration, note: String, now: Date = Date(), user: String = NSUserName()) throws {
+    init(volume: ExternalVolume, duration: ExceptionDuration, note: String) throws {
         guard let volumeUUID = volume.volumeUUID else { throw ExceptionValidationError.missingStableIdentifier }
         let cleaned = note.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !cleaned.isEmpty else { throw ExceptionValidationError.missingNote }
@@ -34,10 +32,37 @@ struct ExceptionRequest: Codable, Equatable, Sendable {
         volumeName = volume.name
         fileSystem = volume.fileSystem
         self.note = cleaned
-        requestedBy = user
-        requestedAt = now
-        expiresAt = now.addingTimeInterval(duration.interval)
+        durationMinutes = duration.rawValue
     }
+}
+
+enum ActiveExceptionStatus: String, Codable, Sendable {
+    case activating
+    case active
+    case expirationPending
+}
+
+struct ActiveException: Codable, Equatable, Sendable {
+    let requestID: UUID
+    let volumeUUID: String
+    var bsdName: String
+    let volumeName: String
+    let fileSystem: String
+    let note: String
+    let requestedBy: String
+    let requestingUID: UInt32
+    let startedAt: Date
+    let expiresAt: Date
+    let expiresAtEpoch: Int64
+    var status: ActiveExceptionStatus
+    var retryCount: Int
+    var lastRetryAt: Date?
+    var lastError: String?
+}
+
+struct HelperSnapshot: Codable, Equatable, Sendable {
+    let activeException: ActiveException?
+    let auditLogPath: String
 }
 
 enum ExceptionValidationError: LocalizedError {
@@ -72,6 +97,7 @@ struct ExceptionAuditEvent: Codable, Sendable {
     let volumeUUID: String
     let volumeName: String
     let requestedBy: String
+    let requestingUID: UInt32
     let note: String
     let detail: String
 }

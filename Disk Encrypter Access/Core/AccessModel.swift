@@ -10,6 +10,7 @@ final class AccessModel: ObservableObject {
     @Published private(set) var isRefreshing = false
     @Published private(set) var errorMessage: String?
     @Published private(set) var helperStatus: HelperStatus = .notInstalled
+    @Published private(set) var activeException: ActiveException?
     let currentUserIsAdmin: Bool
 
     private let discovery: DiskutilVolumeDiscovery
@@ -17,7 +18,7 @@ final class AccessModel: ObservableObject {
 
     init(
         discovery: DiskutilVolumeDiscovery = DiskutilVolumeDiscovery(),
-        service: any PrivilegedExceptionServicing = DeferredPrivilegedExceptionService(),
+        service: any PrivilegedExceptionServicing = XPCPrivilegedExceptionService(),
         currentUserIsAdmin: Bool = AdminEligibility.currentUserIsAdmin()
     ) {
         self.discovery = discovery
@@ -43,11 +44,25 @@ final class AccessModel: ObservableObject {
         if note.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty { return "A reason is required for the audit record." }
         if note.count > 500 { return "Keep the reason to 500 characters or fewer." }
         if !currentUserIsAdmin { return "Only an administrator can request an exception." }
-        if helperStatus != .ready { return "Privileged helper installation is required before disk access can change." }
+        if activeException != nil { return "End the current exception before requesting another one." }
+        if helperStatus != .ready { return "Privileged helper approval is required before disk access can change." }
         return nil
     }
 
     var canStartException: Bool { validationMessage == nil && !isRefreshing }
+
+    var helperStatusText: String {
+        switch helperStatus {
+        case .notInstalled:
+            "The bundled root helper must be registered before disk access can change."
+        case .requiresApproval:
+            "An administrator must approve the helper in System Settings > General > Login Items & Extensions."
+        case .unavailable(let detail):
+            detail
+        case .ready:
+            "The signed helper is approved. Requests are validated and recorded in the protected audit log."
+        }
+    }
 
     func refreshVolumes() async {
         isRefreshing = true
@@ -59,8 +74,31 @@ final class AccessModel: ObservableObject {
             let (newVolumes, newStatus) = try await (found, status)
             volumes = newVolumes
             helperStatus = newStatus
+            if newStatus == .ready {
+                activeException = try await service.snapshot().activeException
+            } else {
+                activeException = nil
+            }
             if let selectedVolumeID, !volumes.contains(where: { $0.id == selectedVolumeID }) {
                 self.selectedVolumeID = nil
+            }
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
+
+    func refreshHelperState() async {
+        let previous = activeException
+        let status = await service.status()
+        helperStatus = status
+        guard status == .ready else {
+            activeException = nil
+            return
+        }
+        do {
+            activeException = try await service.snapshot().activeException
+            if previous != nil, activeException == nil {
+                volumes = try await discovery.mountedUnencryptedExternalVolumes()
             }
         } catch {
             errorMessage = error.localizedDescription
@@ -71,8 +109,34 @@ final class AccessModel: ObservableObject {
         guard let volume = selectedVolume else { return }
         do {
             let request = try ExceptionRequest(volume: volume, duration: duration, note: note)
-            try await service.begin(request)
+            activeException = try await service.begin(request).activeException
             note = ""
+            await refreshVolumes()
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
+
+    func registerHelper() async {
+        errorMessage = nil
+        do {
+            try await service.register()
+            helperStatus = await service.status()
+        } catch {
+            errorMessage = error.localizedDescription
+            helperStatus = await service.status()
+        }
+    }
+
+    func openApprovalSettings() async {
+        await service.openApprovalSettings()
+    }
+
+    func revokeException() async {
+        guard let activeException else { return }
+        errorMessage = nil
+        do {
+            self.activeException = try await service.revoke(requestID: activeException.requestID).activeException
             await refreshVolumes()
         } catch {
             errorMessage = error.localizedDescription

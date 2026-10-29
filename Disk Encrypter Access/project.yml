@@ -16,6 +16,26 @@ targets:
     sources:
       - path: App
       - path: Core
+      - path: Helper/ProtectedExceptionStore.swift
+    dependencies:
+      - target: Disk Encrypter Access Helper
+    postBuildScripts:
+      - name: Embed privileged helper
+        script: |
+          set -euo pipefail
+          APP_CONTENTS="${TARGET_BUILD_DIR}/${CONTENTS_FOLDER_PATH}"
+          HELPER_DIR="${APP_CONTENTS}/Library/LaunchServices"
+          PLIST_DIR="${APP_CONTENTS}/Library/LaunchDaemons"
+          /bin/mkdir -p "${HELPER_DIR}" "${PLIST_DIR}"
+          /usr/bin/ditto "${BUILT_PRODUCTS_DIR}/com.macvfx.DiskEncrypterAccess.Helper" "${HELPER_DIR}/com.macvfx.DiskEncrypterAccess.Helper"
+          /bin/chmod 755 "${HELPER_DIR}/com.macvfx.DiskEncrypterAccess.Helper"
+          /usr/bin/ditto "${SRCROOT}/Resources/com.macvfx.DiskEncrypterAccess.Helper.plist" "${PLIST_DIR}/com.macvfx.DiskEncrypterAccess.Helper.plist"
+        inputFiles:
+          - $(BUILT_PRODUCTS_DIR)/com.macvfx.DiskEncrypterAccess.Helper
+          - $(SRCROOT)/Resources/com.macvfx.DiskEncrypterAccess.Helper.plist
+        outputFiles:
+          - $(TARGET_BUILD_DIR)/$(CONTENTS_FOLDER_PATH)/Library/LaunchServices/com.macvfx.DiskEncrypterAccess.Helper
+          - $(TARGET_BUILD_DIR)/$(CONTENTS_FOLDER_PATH)/Library/LaunchDaemons/com.macvfx.DiskEncrypterAccess.Helper.plist
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.macvfx.DiskEncrypterAccess
@@ -25,9 +45,27 @@ targets:
         INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.utilities
         INFOPLIST_KEY_NSPrincipalClass: NSApplication
         ENABLE_HARDENED_RUNTIME: YES
+        ENABLE_USER_SCRIPT_SANDBOXING: NO
     scheme:
       testTargets:
         - Disk Encrypter AccessTests
+        - Disk Encrypter Access HelperTests
+  Disk Encrypter Access Helper:
+    type: tool
+    platform: macOS
+    sources:
+      - path: Helper
+      - path: Core/AdminEligibility.swift
+      - path: Core/DiskutilVolumeDiscovery.swift
+      - path: Core/ExceptionModels.swift
+      - path: Core/ExternalVolume.swift
+      - path: Core/HelperXPCProtocol.swift
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.macvfx.DiskEncrypterAccess.Helper
+        PRODUCT_NAME: com.macvfx.DiskEncrypterAccess.Helper
+        ENABLE_HARDENED_RUNTIME: YES
+        SKIP_INSTALL: YES
   Disk Encrypter AccessTests:
     type: bundle.unit-test
     platform: macOS
@@ -38,4 +76,20 @@ targets:
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.macvfx.DiskEncrypterAccessTests
+        GENERATE_INFOPLIST_FILE: YES
+  Disk Encrypter Access HelperTests:
+    type: bundle.unit-test
+    platform: macOS
+    sources:
+      - path: HelperTests
+      - path: Helper/DiskMutationController.swift
+      - path: Helper/ExceptionManager.swift
+      - path: Helper/ProtectedExceptionStore.swift
+      - path: Core/DiskutilVolumeDiscovery.swift
+      - path: Core/ExceptionModels.swift
+      - path: Core/ExternalVolume.swift
+      - path: Core/HelperXPCProtocol.swift
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.macvfx.DiskEncrypterAccessHelperTests
         GENERATE_INFOPLIST_FILE: YES

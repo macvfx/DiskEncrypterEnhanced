@@ -3,8 +3,19 @@ import Foundation
 
 enum AdminEligibility {
     static func currentUserIsAdmin() -> Bool {
-        let username = NSUserName()
-        guard let user = getpwnam(username), let admin = getgrnam("admin") else { return false }
+        isUserAdmin(uid: getuid())
+    }
+
+    static func username(uid: uid_t) -> String? {
+        guard let user = getpwuid(uid), let name = user.pointee.pw_name else { return nil }
+        return String(cString: name)
+    }
+
+    static func isUserAdmin(uid: uid_t) -> Bool {
+        if uid == 0 { return true }
+        guard let username = username(uid: uid),
+              let user = getpwuid(uid),
+              let admin = getgrnam("admin") else { return false }
 
         var count: Int32 = 0
         let primaryGroup = Int32(user.pointee.pw_gid)

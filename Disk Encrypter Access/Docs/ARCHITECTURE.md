@@ -8,7 +8,7 @@ The SwiftUI app is an unprivileged client. It discovers candidate volumes and co
 
 ## Privileged path
 
-The production helper will:
+The bundled helper:
 
 1. Accept requests only from the correctly signed Disk Encrypter Access application.
 2. obtain the requesting UID from the XPC connection and require membership in the local `admin` group;
@@ -23,10 +23,14 @@ DiskEncrypter will read only the root-owned active-exception property list and s
 
 ## Expiration safety
 
-At expiration the helper attempts a clean unmount and read-only remount. It never force-unmounts a busy filesystem. If open files prevent the transition, the state becomes `expirationPending`, the event is logged, the user is notified, and bounded retries continue while the exception remains visibly unresolved.
+At expiration the helper attempts a clean unmount and read-only remount. It never force-unmounts a busy filesystem. If open files prevent the transition, the state becomes `expirationPending`, the event is logged, and bounded rapid retries continue before moving to five-minute retry intervals. The app displays the unresolved state whenever it is open.
 
 If the disk is disconnected, the exception closes. A later reconnection has no exception and is handled normally by DiskEncrypter.
 
 ## Future SimpleMDM reporting
 
 The local protected audit log is canonical. A later reporting adapter can expose a sanitized current-state or last-event value to a SimpleMDM custom attribute. API credentials must not be embedded in the user-facing app, and sending the operator note must be separately configurable because it can contain private information.
+
+## Proof boundary
+
+The helper, storage, fake-disk lifecycle, script syntax, and bundle layout can be verified without privilege. Live registration requires a signed and notarized app in `/Applications` plus administrator approval. Until that gate is run, compilation and unit tests do not prove launchd registration or real-volume mutation.

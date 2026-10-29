@@ -51,6 +51,8 @@ DiskEncryption2.0/
 └── README.md                                         # This file
 ```
 
+The repository also includes [Disk Encrypter Access](Disk%20Encrypter%20Access/README.md), a SwiftUI administrator tool for one-volume, audited, time-limited writing exceptions. Its signed privileged-helper workflow is separate from the shell-only installation steps below.
+
 ## Quick Start Installation
 
 There are two ways to install. They set up the same daemon under **different LaunchDaemon labels** — use one, not both:

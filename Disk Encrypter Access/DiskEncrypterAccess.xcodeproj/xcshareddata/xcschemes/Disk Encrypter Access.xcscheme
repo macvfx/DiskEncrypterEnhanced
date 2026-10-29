@@ -50,6 +50,17 @@
                ReferencedContainer = "container:DiskEncrypterAccess.xcodeproj">
             </BuildableReference>
          </TestableReference>
+         <TestableReference
+            skipped = "NO"
+            parallelizable = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "DE57D3021BD6779A18552B5A"
+               BuildableName = "Disk Encrypter Access HelperTests.xctest"
+               BlueprintName = "Disk Encrypter Access HelperTests"
+               ReferencedContainer = "container:DiskEncrypterAccess.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
       <CommandLineArguments>
       </CommandLineArguments>

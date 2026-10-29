@@ -50,6 +50,11 @@ struct DiskutilVolumeDiscovery: Sendable {
 
     func mountedUnencryptedExternalVolumes() async throws -> [ExternalVolume] {
         try await Task.detached(priority: .userInitiated) {
+            try mountedUnencryptedExternalVolumesSync()
+        }.value
+    }
+
+    func mountedUnencryptedExternalVolumesSync() throws -> [ExternalVolume] {
             let listing = try runner.run("/usr/sbin/diskutil", arguments: ["list", "-plist", "external"])
             guard listing.status == 0 else {
                 throw VolumeDiscoveryError.commandFailed(Self.message(from: listing.stderr))
@@ -75,7 +80,6 @@ struct DiskutilVolumeDiscovery: Sendable {
                 return Self.parseVolumeInfo(info, identifier: identifier)
             }
             .sorted { $0.name.localizedStandardCompare($1.name) == .orderedAscending }
-        }.value
     }
 
     static func parseVolumeInfo(_ info: [String: Any], identifier: String) -> ExternalVolume? {

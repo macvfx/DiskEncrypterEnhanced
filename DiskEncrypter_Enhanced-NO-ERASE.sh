@@ -265,6 +265,43 @@ log_operation() {
     fi
 }
 
+EXCEPTION_STATE_FILE="/var/db/DiskEncrypter/active-exception.plist"
+
+# A valid exception is root-owned, time-limited, and matched by stable Volume UUID.
+# BSD identifiers such as disk4s1 are deliberately not trusted as identity.
+is_volume_write_exception_active() {
+    local volumeID=$1
+    [[ -f "$EXCEPTION_STATE_FILE" ]] || return 1
+
+    local owner mode
+    owner=$(stat -f %u "$EXCEPTION_STATE_FILE" 2>/dev/null)
+    mode=$(stat -f %Lp "$EXCEPTION_STATE_FILE" 2>/dev/null)
+    if [[ "$owner" != "0" ]] || [[ "$mode" != "600" ]]; then
+        log_warn "Ignoring unsafe Disk Encrypter Access state file ownership or permissions"
+        return 1
+    fi
+
+    local volumeUUID exceptionUUID expiresAt status now
+    volumeUUID=$(diskutil info -plist "$volumeID" 2>/dev/null | plutil -extract VolumeUUID raw -o - - 2>/dev/null)
+    exceptionUUID=$(plutil -extract volumeUUID raw -o - "$EXCEPTION_STATE_FILE" 2>/dev/null)
+    expiresAt=$(plutil -extract expiresAtEpoch raw -o - "$EXCEPTION_STATE_FILE" 2>/dev/null)
+    status=$(plutil -extract status raw -o - "$EXCEPTION_STATE_FILE" 2>/dev/null)
+    now=$(date +%s)
+
+    [[ -n "$volumeUUID" ]] && [[ -n "$exceptionUUID" ]] || return 1
+    [[ "$expiresAt" =~ ^[0-9]+$ ]] || return 1
+    [[ "$status" == "activating" ]] || [[ "$status" == "active" ]] || return 1
+    [[ "$now" -lt "$expiresAt" ]] || return 1
+
+    volumeUUID=$(echo "$volumeUUID" | tr '[:lower:]' '[:upper:]')
+    exceptionUUID=$(echo "$exceptionUUID" | tr '[:lower:]' '[:upper:]')
+    if [[ "$volumeUUID" == "$exceptionUUID" ]]; then
+        log_warn "Skipping read-only enforcement for $volumeID: active timed Disk Encrypter Access exception"
+        return 0
+    fi
+    return 1
+}
+
 ###########################################
 ############ GLOBAL TRACKING ###############
 ###########################################
@@ -1188,6 +1225,10 @@ main() {
                         if [[ "$volumeFileVaultLine" == "No" ]]; then
                             log_info "Found unencrypted APFS volume: $VolumeID ($volumeName)"
 
+                            if is_volume_write_exception_active "$VolumeID"; then
+                                continue
+                            fi
+
                             # Auto-mount as read-only before adding to queue
                             mountReadOnly "$VolumeID" "$volumeName"
 
@@ -1248,6 +1289,10 @@ main() {
 
                 log_info "Found unencrypted HFS+ volume: $VolumeID ($volumeName)"
 
+                if is_volume_write_exception_active "$VolumeID"; then
+                    continue
+                fi
+
                 # Auto-mount as read-only before adding to queue
                 mountReadOnly "$VolumeID" "$volumeName"
 
@@ -1295,6 +1340,10 @@ main() {
                 fi
 
                 log_info "Found non-encryptable volume: $VolumeID ($volumeName)"
+
+                if is_volume_write_exception_active "$VolumeID"; then
+                    continue
+                fi
 
                 # Auto-mount as read-only before adding to queue
                 mountReadOnly "$VolumeID" "$volumeName"

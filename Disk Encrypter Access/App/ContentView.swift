@@ -7,12 +7,23 @@ struct ContentView: View {
         VStack(alignment: .leading, spacing: 18) {
             header
             protectionNotice
+            if let active = model.activeException {
+                ActiveExceptionCard(active: active) {
+                    Task { await model.revokeException() }
+                }
+            }
             volumeSection
             exceptionSection
             footer
         }
         .padding(24)
         .task { await model.refreshVolumes() }
+        .task {
+            while !Task.isCancelled {
+                try? await Task.sleep(nanoseconds: 5_000_000_000)
+                await model.refreshHelperState()
+            }
+        }
     }
 
     private var header: some View {
@@ -127,19 +138,74 @@ struct ContentView: View {
 
                 Spacer()
 
-                Button("Start Timed Exception") {
-                    Task { await model.startException() }
-                }
-                .buttonStyle(.borderedProminent)
-                .disabled(!model.canStartException)
+                helperControls
             }
 
-            if model.helperStatus != .ready {
-                Text("The signed privileged helper is not installed yet. Disk mutation stays disabled until caller validation, protected logging, and automatic recovery are complete.")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-            }
+            Text(model.helperStatusText)
+                .font(.caption)
+                .foregroundStyle(.secondary)
         }
+    }
+
+    @ViewBuilder
+    private var helperControls: some View {
+        switch model.helperStatus {
+        case .notInstalled:
+            Button("Register Privileged Helper") {
+                Task { await model.registerHelper() }
+            }
+            .buttonStyle(.borderedProminent)
+            .disabled(!model.currentUserIsAdmin)
+        case .requiresApproval:
+            Button("Open Approval Settings") {
+                Task { await model.openApprovalSettings() }
+            }
+            .buttonStyle(.borderedProminent)
+        case .unavailable:
+            Button("Helper Unavailable") {}
+                .disabled(true)
+        case .ready:
+            Button("Start Timed Exception") {
+                Task { await model.startException() }
+            }
+            .buttonStyle(.borderedProminent)
+            .disabled(!model.canStartException)
+        }
+    }
+}
+
+private struct ActiveExceptionCard: View {
+    let active: ActiveException
+    let revoke: () -> Void
+
+    var body: some View {
+        TimelineView(.periodic(from: .now, by: 1)) { context in
+            HStack(spacing: 12) {
+                Image(systemName: active.status == .expirationPending ? "exclamationmark.shield.fill" : "clock.badge.checkmark.fill")
+                    .font(.title2)
+                    .foregroundStyle(active.status == .expirationPending ? .red : .orange)
+                VStack(alignment: .leading, spacing: 3) {
+                    Text(active.status == .expirationPending ? "Protection restoration pending" : "Writing exception active")
+                        .font(.headline)
+                    Text("\(active.volumeName) • \(remaining(at: context.date))")
+                        .font(.callout)
+                    Text(active.note)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(2)
+                }
+                Spacer()
+                Button("End Now", role: .destructive, action: revoke)
+            }
+            .padding(12)
+            .background(.orange.opacity(0.10), in: RoundedRectangle(cornerRadius: 10))
+        }
+    }
+
+    private func remaining(at date: Date) -> String {
+        let seconds = max(0, Int(active.expiresAt.timeIntervalSince(date)))
+        if seconds == 0 { return "expiring now" }
+        return "\(seconds / 60):\(String(format: "%02d", seconds % 60)) remaining"
     }
 }
 
