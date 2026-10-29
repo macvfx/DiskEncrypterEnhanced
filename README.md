@@ -44,7 +44,7 @@ This package contains all files needed to deploy the DiskEncrypter solution:
 ```
 DiskEncryption2.0/
 ├── DiskEncrypter_Enhanced.sh                          # Main encryption script
-├── com.custom.diskencrypter.volumewatcher.plist      # LaunchDaemon configuration
+├── com.custom.diskencrypter.volumewatcher.plist      # LaunchDaemon configuration (script install)
 ├── com.custom.diskencrypter.plist                    # Settings/preferences (example)
 ├── install_launchdaemon.sh                           # Installation script
 ├── uninstall_launchdaemon.sh                         # Uninstallation script
@@ -52,6 +52,19 @@ DiskEncryption2.0/
 ```
 
 ## Quick Start Installation
+
+There are two ways to install. They set up the same daemon under **different LaunchDaemon labels** — use one, not both:
+
+| Install method | LaunchDaemon label | Plist |
+|---|---|---|
+| Installer package from [Releases](https://github.com/macvfx/DiskEncrypterEnhanced/releases) | `com.custom.diskencrypter` | `/Library/LaunchDaemons/com.custom.diskencrypter.plist` |
+| `install_launchdaemon.sh` (steps below) | `com.custom.diskencrypter.volumewatcher` | `/Library/LaunchDaemons/com.custom.diskencrypter.volumewatcher.plist` |
+
+The installer package also installs the settings file. To see which label a Mac has:
+
+```bash
+ls /Library/LaunchDaemons/ | grep diskencrypter
+```
 
 ### 1. Copy Settings File (Optional but Recommended)
 
@@ -81,7 +94,7 @@ The installer will:
 sudo launchctl list | grep diskencrypter
 ```
 
-You should see: `com.custom.diskencrypter.volumewatcher`
+You should see `com.custom.diskencrypter.volumewatcher` (script install) or `com.custom.diskencrypter` (installer package). Use `sudo` — without it, `launchctl list` doesn't show system daemons.
 
 ### 4. Monitor Logs
 
@@ -173,10 +186,12 @@ sudo /Library/Application\ Support/Custom/DiskEncrypter_Enhanced.sh --dry-run --
 sudo bash uninstall_launchdaemon.sh
 ```
 
-This will:
-- Unload the LaunchDaemon
-- Remove installed files
-- Optionally remove log files
+Works for both the installer package and the script install. This will:
+- Unload the LaunchDaemon (either label) and clear any disabled flag
+- Remove the LaunchDaemon plist(s), the installed script and the package receipt
+- Archive log files to `~/diskencrypter_logs_<timestamp>/`
+
+Settings in `/Library/Managed Preferences/` are left in place, since they may be managed by MDM.
 
 ## Troubleshooting
 
@@ -186,13 +201,75 @@ sudo launchctl list | grep diskencrypter
 ```
 
 ### Manual daemon control
-```bash
-# Stop
-sudo launchctl unload /Library/LaunchDaemons/com.custom.diskencrypter.volumewatcher.plist
 
-# Start
-sudo launchctl load /Library/LaunchDaemons/com.custom.diskencrypter.volumewatcher.plist
+These use the installer package label, `com.custom.diskencrypter`. For a script install, use `com.custom.diskencrypter.volumewatcher` and its plist instead.
+
+```bash
+# Status ("Could not find service" = not loaded)
+sudo launchctl print system/com.custom.diskencrypter
+
+# Stop for the current boot session
+sudo launchctl bootout system/com.custom.diskencrypter
+
+# Keep stopped across reboots (not needed for a short writing exception)
+sudo launchctl disable system/com.custom.diskencrypter
+
+# Re-enable after a persistent disable, then start
+sudo launchctl enable system/com.custom.diskencrypter
+sudo launchctl bootstrap system /Library/LaunchDaemons/com.custom.diskencrypter.plist
 ```
+
+Starting the daemon runs the script immediately (`RunAtLoad`) against every mounted volume — eject any drive you don't want it to act on first.
+
+### Temporarily write to an unencrypted disk
+
+Use this procedure only for a deliberate, short-lived exception. Stopping the daemon does **not** change a disk that DiskEncrypter has already mounted read-only; the volume must be unmounted and mounted again after the daemon is confirmed stopped.
+
+First, identify the volume and its parent physical disk. Replace the fictional identifiers below with the values shown by `diskutil list external physical`:
+
+```bash
+diskutil list external physical
+VOLUME_ID="diskXsY"
+PHYSICAL_DISK="diskX"
+```
+
+Stop the installer-package daemon and confirm it is no longer loaded:
+
+```bash
+sudo launchctl bootout system/com.custom.diskencrypter
+sudo launchctl print system/com.custom.diskencrypter
+```
+
+The second command should report `Could not find service`. If it still prints service details, **stop here**; do not remount the unencrypted volume while DiskEncrypter remains active.
+
+Remount only the intended volume and verify that it is writable:
+
+```bash
+diskutil unmount "$VOLUME_ID"
+diskutil mount "$VOLUME_ID"
+diskutil info "$VOLUME_ID" | grep -E "Media Read-Only|Volume Read-Only"
+```
+
+Both read-only fields should report `No`. If either reports `Yes`, do not write to the disk until the cause is understood. A hardware write-protect switch, unsupported filesystem, damaged filesystem, or another policy can also make a volume read-only.
+
+When the write is complete, eject the physical disk **before** restarting DiskEncrypter:
+
+```bash
+diskutil eject "$PHYSICAL_DISK"
+sudo launchctl bootstrap system /Library/LaunchDaemons/com.custom.diskencrypter.plist
+sudo launchctl print system/com.custom.diskencrypter
+```
+
+The final command should print the loaded service. Because the plist uses `RunAtLoad`, restarting DiskEncrypter immediately scans all mounted volumes.
+
+For an installation made with `install_launchdaemon.sh`, substitute these values throughout the stop, status and start commands:
+
+| Setting | Installer package | Script install |
+|---|---|---|
+| LaunchDaemon label | `com.custom.diskencrypter` | `com.custom.diskencrypter.volumewatcher` |
+| LaunchDaemon plist | `/Library/LaunchDaemons/com.custom.diskencrypter.plist` | `/Library/LaunchDaemons/com.custom.diskencrypter.volumewatcher.plist` |
+
+`launchctl bootout` is the appropriate temporary control: the plist remains installed and will load again after `bootstrap` or the next reboot. Avoid `launchctl disable` for a short exception because its disabled state persists across reboots.
 
 ### Check logs
 ```bash
@@ -217,7 +294,8 @@ sudo /Library/Application\ Support/Custom/DiskEncrypter_Enhanced.sh --dry-run --
 | Component | Location |
 |-----------|----------|
 | Script | `/Library/Application Support/Custom/DiskEncrypter_Enhanced.sh` |
-| LaunchDaemon | `/Library/LaunchDaemons/com.custom.diskencrypter.volumewatcher.plist` |
+| LaunchDaemon (installer package) | `/Library/LaunchDaemons/com.custom.diskencrypter.plist` |
+| LaunchDaemon (script install) | `/Library/LaunchDaemons/com.custom.diskencrypter.volumewatcher.plist` |
 | Settings | `/Library/Managed Preferences/com.custom.diskencrypter.plist` |
 | Main Log | `/var/log/diskencrypter.log` |
 | Error Log | `/var/log/diskencrypter_error.log` |
@@ -232,6 +310,10 @@ sudo /Library/Application\ Support/Custom/DiskEncrypter_Enhanced.sh --dry-run --
 - SwiftDialog (auto-downloaded if not present)
 
 ## Version History
+
+### Unreleased
+- **FIXED:** `uninstall_launchdaemon.sh` did nothing on Macs installed from the installer package. The package installs LaunchDaemon `com.custom.diskencrypter`, but the uninstaller only looked for `com.custom.diskencrypter.volumewatcher` (the `install_launchdaemon.sh` label), so the daemon stayed loaded after its script was deleted. It now handles both labels and removes the package receipt.
+- **DOCS:** Installation, troubleshooting and file locations now cover both LaunchDaemon labels, including a verified stop, remount, write, eject and restart procedure for temporary unencrypted-disk access.
 
 ### v2.4.5 - December 15, 2025
 - **FIXED:** Password hints can now have spaces when encrypting
