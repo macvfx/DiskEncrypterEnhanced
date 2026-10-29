@@ -17,13 +17,33 @@ enum AdminEligibility {
               let user = getpwuid(uid),
               let admin = getgrnam("admin") else { return false }
 
-        var count: Int32 = 0
-        let primaryGroup = Int32(user.pointee.pw_gid)
-        _ = getgrouplist(username, primaryGroup, nil, &count)
-        guard count > 0 else { return false }
+        guard let groups = supplementaryGroupIDs(
+            username: username,
+            primaryGroup: user.pointee.pw_gid
+        ) else { return false }
+        return containsAdminGroup(groups, adminGroupID: admin.pointee.gr_gid)
+    }
 
-        var groups = [Int32](repeating: 0, count: Int(count))
-        guard getgrouplist(username, primaryGroup, &groups, &count) >= 0 else { return false }
-        return groups.prefix(Int(count)).contains(Int32(admin.pointee.gr_gid))
+    static func containsAdminGroup(_ groups: [gid_t], adminGroupID: gid_t) -> Bool {
+        groups.contains(adminGroupID)
+    }
+
+    private static func supplementaryGroupIDs(
+        username: String,
+        primaryGroup: gid_t
+    ) -> [gid_t]? {
+        // On macOS, calling getgrouplist with a nil, zero-sized buffer can
+        // succeed with a count of zero. Start with storage and grow it until
+        // Directory Services can return the complete membership list.
+        var capacity = 32
+        while capacity <= 4096 {
+            var count = Int32(capacity)
+            var groups = [Int32](repeating: 0, count: capacity)
+            if getgrouplist(username, Int32(primaryGroup), &groups, &count) >= 0 {
+                return groups.prefix(Int(count)).map(gid_t.init)
+            }
+            capacity = max(capacity * 2, Int(count))
+        }
+        return nil
     }
 }

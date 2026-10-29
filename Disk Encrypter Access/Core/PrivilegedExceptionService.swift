@@ -21,16 +21,26 @@ final class XPCPrivilegedExceptionService: PrivilegedExceptionServicing, @unchec
     private let daemon = SMAppService.daemon(plistName: HelperConstants.daemonPlistName)
 
     func status() async -> HelperStatus {
-        switch daemon.status {
+        if let bundleError = bundledComponentError() {
+            return .unavailable(bundleError)
+        }
+        return switch daemon.status {
         case .enabled: .ready
         case .requiresApproval: .requiresApproval
         case .notRegistered: .notInstalled
-        case .notFound: .unavailable("The bundled privileged helper could not be found.")
+        case .notFound:
+            // Some systems report notFound before the embedded daemon has
+            // ever been registered. The bundle was verified above, so allow
+            // registration and surface the detailed error from register().
+            .notInstalled
         @unknown default: .unavailable("The privileged helper returned an unknown status.")
         }
     }
 
     func register() async throws {
+        if let bundleError = bundledComponentError() {
+            throw PrivilegedServiceError.registrationFailed(bundleError)
+        }
         do {
             try daemon.register()
         } catch {
@@ -53,6 +63,23 @@ final class XPCPrivilegedExceptionService: PrivilegedExceptionServicing, @unchec
 
     func revoke(requestID: UUID) async throws -> HelperSnapshot {
         try await call { proxy, reply in proxy.revoke(requestID: requestID.uuidString, reply: reply) }
+    }
+
+    private func bundledComponentError() -> String? {
+        let contents = Bundle.main.bundleURL.appendingPathComponent("Contents", isDirectory: true)
+        let plist = contents
+            .appendingPathComponent("Library/LaunchDaemons", isDirectory: true)
+            .appendingPathComponent(HelperConstants.daemonPlistName)
+        let helper = contents
+            .appendingPathComponent("Library/LaunchServices", isDirectory: true)
+            .appendingPathComponent(HelperConstants.machServiceName)
+        guard FileManager.default.fileExists(atPath: plist.path) else {
+            return "The installed app is missing its bundled LaunchDaemon plist. Recopy the complete app to /Applications."
+        }
+        guard FileManager.default.isExecutableFile(atPath: helper.path) else {
+            return "The installed app is missing its bundled privileged helper executable. Recopy the complete app to /Applications."
+        }
+        return nil
     }
 
     private func call(

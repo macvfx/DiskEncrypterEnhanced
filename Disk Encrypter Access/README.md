@@ -43,6 +43,8 @@ The tests use fictional volume identities and a fake disk controller. They do no
 
 An ad-hoc or unsigned development build can compile and run the non-privileged interface, but it is not accepted as live helper-registration proof. Live acceptance must separately verify registration, administrator rejection/approval, XPC caller validation, one disposable external volume, expiry, busy-volume recovery, sleep/wake, reboot, and audit ownership/content.
 
+Use [Docs/TESTING.md](Docs/TESTING.md) for the two-Mac signed-build acceptance checklist, evidence requirements, and failure recovery procedure.
+
 ## Future SimpleMDM reporting
 
 The protected local audit log is canonical. A future adapter can publish a sanitized current-state or last-event value to a SimpleMDM custom attribute without embedding an API credential in the user-facing app. Sending the operator-entered reason must be separately configurable because it may contain private information.

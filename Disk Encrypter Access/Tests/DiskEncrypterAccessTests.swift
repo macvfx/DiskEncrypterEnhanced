@@ -2,6 +2,11 @@ import XCTest
 @testable import Disk_Encrypter_Access
 
 final class DiskEncrypterAccessTests: XCTestCase {
+    func testAdminGroupMatchingUsesSupplementaryGroups() {
+        XCTAssertTrue(AdminEligibility.containsAdminGroup([20, 80, 204], adminGroupID: 80))
+        XCTAssertFalse(AdminEligibility.containsAdminGroup([20, 61, 204], adminGroupID: 80))
+    }
+
     func testParsesMountedUnencryptedExternalVolume() throws {
         let info: [String: Any] = [
             "Internal": false,
