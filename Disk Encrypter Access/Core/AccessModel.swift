@@ -82,6 +82,9 @@ final class AccessModel: ObservableObject {
             if let selectedVolumeID, !volumes.contains(where: { $0.id == selectedVolumeID }) {
                 self.selectedVolumeID = nil
             }
+            if selectedVolumeID == nil, volumes.count == 1 {
+                selectedVolumeID = volumes[0].id
+            }
         } catch {
             errorMessage = error.localizedDescription
         }
@@ -107,6 +110,7 @@ final class AccessModel: ObservableObject {
 
     func startException() async {
         guard let volume = selectedVolume else { return }
+        errorMessage = nil
         do {
             let request = try ExceptionRequest(volume: volume, duration: duration, note: note)
             activeException = try await service.begin(request).activeException
