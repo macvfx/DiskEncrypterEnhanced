@@ -7,12 +7,7 @@ struct ContentView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 18) {
                 header
-                protectionNotice
-                if let active = model.activeException {
-                    ActiveExceptionCard(active: active) {
-                        Task { await model.revokeException() }
-                    }
-                }
+                accessStatus
                 volumeSection
                 exceptionSection
             }
@@ -31,6 +26,26 @@ struct ContentView: View {
                 try? await Task.sleep(nanoseconds: 5_000_000_000)
                 await model.refreshHelperState()
             }
+        }
+    }
+
+    @ViewBuilder
+    private var accessStatus: some View {
+        if model.exceptionOperation == .starting, model.activeException == nil {
+            OperationStatusCard(
+                title: "Enabling writable access…",
+                detail: "Disk Utility is remounting the selected volume. This can take a moment.",
+                systemImage: "clock.arrow.circlepath"
+            )
+        } else if let active = model.activeException {
+            ActiveExceptionCard(
+                active: active,
+                operation: model.exceptionOperation
+            ) {
+                Task { await model.revokeException() }
+            }
+        } else {
+            protectionNotice
         }
     }
 
@@ -175,10 +190,14 @@ struct ContentView: View {
             Button("Helper Unavailable") {}
                 .disabled(true)
         case .ready:
-            if model.isChangingException {
-                ProgressView()
-                    .controlSize(.small)
-                    .accessibilityLabel("Changing disk access")
+            if let operation = model.exceptionOperation {
+                HStack(spacing: 7) {
+                    ProgressView()
+                        .controlSize(.small)
+                    Text(operation == .starting ? "Enabling access…" : "Restoring protection…")
+                        .font(.callout)
+                }
+                .accessibilityElement(children: .combine)
             } else {
                 Button("Start Timed Exception") {
                     Task { await model.startException() }
@@ -190,33 +209,72 @@ struct ContentView: View {
     }
 }
 
+private struct OperationStatusCard: View {
+    let title: String
+    let detail: String
+    let systemImage: String
+
+    var body: some View {
+        HStack(alignment: .top, spacing: 12) {
+            Image(systemName: systemImage)
+                .font(.title2)
+                .foregroundStyle(.orange)
+            VStack(alignment: .leading, spacing: 3) {
+                Text(title)
+                    .font(.headline)
+                Text(detail)
+                    .font(.callout)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            .layoutPriority(1)
+            Spacer(minLength: 8)
+            ProgressView()
+                .controlSize(.small)
+        }
+        .padding(12)
+        .background(.orange.opacity(0.10), in: RoundedRectangle(cornerRadius: 10))
+    }
+}
+
 private struct ActiveExceptionCard: View {
     let active: ActiveException
+    let operation: ExceptionOperation?
     let revoke: () -> Void
 
     var body: some View {
         TimelineView(.periodic(from: .now, by: 1)) { context in
-            HStack(spacing: 12) {
-                Image(systemName: iconName)
-                    .font(.title2)
-                    .foregroundStyle(iconColor)
-                VStack(alignment: .leading, spacing: 3) {
-                    Text(statusTitle)
-                        .font(.headline)
-                    Text(statusDetail(at: context.date))
-                        .font(.callout)
+            VStack(alignment: .leading, spacing: 10) {
+                HStack(alignment: .top, spacing: 12) {
+                    Image(systemName: iconName)
+                        .font(.title2)
+                        .foregroundStyle(iconColor)
+                    VStack(alignment: .leading, spacing: 3) {
+                        Text(statusTitle)
+                            .font(.headline)
+                        Text(statusDetail(at: context.date))
+                            .font(.callout)
+                    }
+                    .layoutPriority(1)
+                    Spacer(minLength: 8)
+                    if operation != nil || active.status == .activating {
+                        ProgressView()
+                            .controlSize(.small)
+                    }
+                }
+
+                HStack(alignment: .bottom, spacing: 12) {
                     Text(active.note)
                         .font(.caption)
                         .foregroundStyle(.secondary)
                         .lineLimit(2)
-                }
-                Spacer()
-                if active.status == .activating {
-                    ProgressView()
-                        .controlSize(.small)
-                        .accessibilityLabel("Enabling writable access")
-                } else {
-                    Button("End Now", role: .destructive, action: revoke)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .layoutPriority(1)
+                    Spacer(minLength: 8)
+                    if operation == nil, active.status != .activating {
+                        Button("End Now", role: .destructive, action: revoke)
+                            .fixedSize()
+                    }
                 }
             }
             .padding(12)
@@ -225,7 +283,9 @@ private struct ActiveExceptionCard: View {
     }
 
     private var statusTitle: String {
-        switch active.status {
+        if operation == .ending { return "Restoring read-only protection…" }
+        if operation == .starting { return "Enabling writable access…" }
+        return switch active.status {
         case .activating: "Enabling writable access…"
         case .active: "Writing exception active"
         case .expirationPending: "Protection restoration pending"
@@ -233,7 +293,7 @@ private struct ActiveExceptionCard: View {
     }
 
     private var iconName: String {
-        switch active.status {
+        return switch active.status {
         case .activating: "clock.arrow.circlepath"
         case .active: "clock.badge.checkmark.fill"
         case .expirationPending: "exclamationmark.shield.fill"
@@ -245,7 +305,8 @@ private struct ActiveExceptionCard: View {
     }
 
     private func statusDetail(at date: Date) -> String {
-        switch active.status {
+        if operation != nil { return "\(active.volumeName) • Please wait" }
+        return switch active.status {
         case .activating: "\(active.volumeName) • Please wait"
         case .active, .expirationPending: "\(active.volumeName) • \(remaining(at: date))"
         }

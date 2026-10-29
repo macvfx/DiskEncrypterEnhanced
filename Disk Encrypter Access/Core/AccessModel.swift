@@ -1,6 +1,11 @@
 import Foundation
 import Combine
 
+enum ExceptionOperation: Equatable {
+    case starting
+    case ending
+}
+
 @MainActor
 final class AccessModel: ObservableObject {
     @Published private(set) var volumes: [ExternalVolume] = []
@@ -8,7 +13,7 @@ final class AccessModel: ObservableObject {
     @Published var duration: ExceptionDuration = .fifteenMinutes
     @Published var note = ""
     @Published private(set) var isRefreshing = false
-    @Published private(set) var isChangingException = false
+    @Published private(set) var exceptionOperation: ExceptionOperation?
     @Published private(set) var errorMessage: String?
     @Published private(set) var helperStatus: HelperStatus = .notInstalled
     @Published private(set) var activeException: ActiveException?
@@ -55,7 +60,7 @@ final class AccessModel: ObservableObject {
     }
 
     var canStartException: Bool {
-        validationMessage == nil && !isRefreshing && !isChangingException
+        validationMessage == nil && !isRefreshing && exceptionOperation == nil
     }
 
     var helperStatusText: String {
@@ -118,8 +123,8 @@ final class AccessModel: ObservableObject {
     func startException() async {
         guard let volume = selectedVolume else { return }
         errorMessage = nil
-        isChangingException = true
-        defer { isChangingException = false }
+        exceptionOperation = .starting
+        defer { exceptionOperation = nil }
         do {
             let request = try ExceptionRequest(volume: volume, duration: duration, note: note)
             activeException = try await service.begin(request).activeException
@@ -151,8 +156,8 @@ final class AccessModel: ObservableObject {
     func revokeException() async {
         guard let activeException else { return }
         errorMessage = nil
-        isChangingException = true
-        defer { isChangingException = false }
+        exceptionOperation = .ending
+        defer { exceptionOperation = nil }
         do {
             self.activeException = try await service.revoke(requestID: activeException.requestID).activeException
             await refreshVolumes()

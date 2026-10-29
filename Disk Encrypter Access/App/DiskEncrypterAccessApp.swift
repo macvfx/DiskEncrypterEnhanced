@@ -20,8 +20,9 @@ struct DiskEncrypterAccessApp: App {
     var body: some Scene {
         WindowGroup("Disk Encrypter Access") {
             ContentView(model: model)
-                .frame(minWidth: 620, minHeight: 560)
+                .frame(minWidth: 680, minHeight: 650)
         }
+        .defaultSize(width: 720, height: 680)
         .windowResizability(.contentMinSize)
     }
 }
