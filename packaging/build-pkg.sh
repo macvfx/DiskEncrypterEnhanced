@@ -74,7 +74,6 @@ COPYFILE_DISABLE=1 /usr/bin/ditto --norsrc --noextattr \
     "$package_path"
 
 /usr/sbin/pkgutil --check-signature "$package_path"
-/usr/sbin/spctl --assess --type install --verbose=4 "$package_path"
 
 /usr/bin/xcrun notarytool submit "$package_path" \
     --keychain-profile "$notary_profile" \
@@ -82,6 +81,7 @@ COPYFILE_DISABLE=1 /usr/bin/ditto --norsrc --noextattr \
     --output-format json > "$output_dir/notarization-${version}.json"
 /usr/bin/xcrun stapler staple "$package_path"
 /usr/bin/xcrun stapler validate "$package_path"
+/usr/sbin/spctl --assess --type install --verbose=4 "$package_path"
 
 /usr/sbin/pkgutil --expand-full "$package_path" "$expanded"
 /usr/bin/grep -R -q "identifier=\"$package_id\"" "$expanded"
