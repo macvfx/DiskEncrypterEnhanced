@@ -94,6 +94,8 @@ final class DiskEncrypterAccessTests: XCTestCase {
         XCTAssertEqual(request.note, "Export approved deliverables")
         XCTAssertEqual(request.durationMinutes, 15)
         XCTAssertThrowsError(try ExceptionRequest(volume: volume, duration: .fiveMinutes, note: ""))
+        XCTAssertThrowsError(try ExceptionRequest(volume: volume, duration: .fiveMinutes, note: "Too short"))
+        XCTAssertNoThrow(try ExceptionRequest(volume: volume, duration: .fiveMinutes, note: "Camera card"))
     }
 
     func testProtectedStateAndAuditRoundTrip() throws {
@@ -122,7 +124,8 @@ final class DiskEncrypterAccessTests: XCTestCase {
             status: .active,
             retryCount: 0,
             lastRetryAt: nil,
-            lastError: nil
+            lastError: nil,
+            cameraMediaStructureDetected: true
         )
 
         try store.write(active)
@@ -139,6 +142,11 @@ final class DiskEncrypterAccessTests: XCTestCase {
             action: .granted,
             volumeUUID: active.volumeUUID,
             volumeName: active.volumeName,
+            bsdName: active.bsdName,
+            fileSystem: active.fileSystem,
+            durationMinutes: 15,
+            expiresAt: active.expiresAt,
+            cameraMediaStructureDetected: true,
             requestedBy: active.requestedBy,
             requestingUID: active.requestingUID,
             note: active.note,
@@ -148,6 +156,8 @@ final class DiskEncrypterAccessTests: XCTestCase {
             .split(separator: "\n")
         XCTAssertEqual(lines.count, 1)
         XCTAssertTrue(lines[0].contains("\"action\":\"granted\""))
+        XCTAssertTrue(lines[0].contains("\"bsdName\":\"disk8s1\""))
+        XCTAssertTrue(lines[0].contains("\"cameraMediaStructureDetected\":true"))
         let auditMode = try XCTUnwrap(
             FileManager.default.attributesOfItem(atPath: paths.auditURL.path)[.posixPermissions] as? NSNumber
         ).intValue & 0o777

@@ -24,6 +24,9 @@ struct ExceptionRequest: Codable, Equatable, Sendable {
         guard let volumeUUID = volume.volumeUUID else { throw ExceptionValidationError.missingStableIdentifier }
         let cleaned = note.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !cleaned.isEmpty else { throw ExceptionValidationError.missingNote }
+        guard cleaned.count >= HelperConstants.minimumReasonLength else {
+            throw ExceptionValidationError.noteTooShort
+        }
         guard cleaned.count <= 500 else { throw ExceptionValidationError.noteTooLong }
 
         requestID = UUID()
@@ -58,6 +61,7 @@ struct ActiveException: Codable, Equatable, Sendable {
     var retryCount: Int
     var lastRetryAt: Date?
     var lastError: String?
+    let cameraMediaStructureDetected: Bool?
 }
 
 struct HelperSnapshot: Codable, Equatable, Sendable {
@@ -68,12 +72,14 @@ struct HelperSnapshot: Codable, Equatable, Sendable {
 enum ExceptionValidationError: LocalizedError {
     case missingStableIdentifier
     case missingNote
+    case noteTooShort
     case noteTooLong
 
     var errorDescription: String? {
         switch self {
         case .missingStableIdentifier: "The selected volume has no stable UUID and cannot receive an exception."
         case .missingNote: "Enter a reason for the exception."
+        case .noteTooShort: "Enter at least \(HelperConstants.minimumReasonLength) characters for the reason."
         case .noteTooLong: "Keep the reason to 500 characters or fewer."
         }
     }
@@ -96,6 +102,11 @@ struct ExceptionAuditEvent: Codable, Sendable {
     let action: ExceptionAuditAction
     let volumeUUID: String
     let volumeName: String
+    let bsdName: String
+    let fileSystem: String
+    let durationMinutes: Int
+    let expiresAt: Date
+    let cameraMediaStructureDetected: Bool
     let requestedBy: String
     let requestingUID: UInt32
     let note: String

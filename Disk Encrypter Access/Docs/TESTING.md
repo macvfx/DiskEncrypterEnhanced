@@ -181,6 +181,13 @@ Expected:
 - The main DiskEncrypter daemon remains loaded.
 - Other volumes receive no exception.
 
+Reason validation:
+
+- Fewer than 10 non-whitespace characters must leave **Start Timed Exception** disabled.
+- Exactly 10 or more trimmed characters must satisfy the minimum.
+- The helper must independently reject a crafted request shorter than 10 characters.
+- Reasons longer than 500 characters must be rejected.
+
 Verify the selected disk:
 
 ```bash
@@ -203,6 +210,13 @@ Expected:
 - State and audit files are owned by `root:wheel` with mode `600`.
 - The state UUID matches `DEA-TEST-A`.
 - Audit events include `requested` and `granted`.
+- Every new audit event includes `volumeName`, `volumeUUID`, `bsdName`,
+  `fileSystem`, `durationMinutes`, `expiresAt`, and
+  `cameraMediaStructureDetected`.
+- A disposable volume with a root-level `DCIM`, `PRIVATE`, `CONTENTS`, `AVCHD`,
+  or `XDROOT` directory records `cameraMediaStructureDetected: true`.
+- The audit must not contain filenames, directory listings, nested paths, or
+  file contents from the volume.
 
 ## 7. Early revocation
 

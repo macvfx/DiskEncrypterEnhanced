@@ -89,7 +89,8 @@ final class ExceptionManager: @unchecked Sendable {
             throw ExceptionManagerError.invalidDuration
         }
         let cleanedNote = request.note.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !cleanedNote.isEmpty, cleanedNote.count <= 500 else {
+        guard cleanedNote.count >= HelperConstants.minimumReasonLength,
+              cleanedNote.count <= 500 else {
             throw ExceptionManagerError.invalidNote
         }
         guard let volume = try disk.resolve(volumeUUID: request.volumeUUID) else {
@@ -113,7 +114,8 @@ final class ExceptionManager: @unchecked Sendable {
             status: .activating,
             retryCount: 0,
             lastRetryAt: nil,
-            lastError: nil
+            lastError: nil,
+            cameraMediaStructureDetected: CameraMediaDetector.detect(at: volume.mountPoint)
         )
 
         try appendAudit(.requested, active: active, detail: "Administrator requested a timed write exception.")
@@ -211,6 +213,11 @@ final class ExceptionManager: @unchecked Sendable {
             action: action,
             volumeUUID: active.volumeUUID,
             volumeName: active.volumeName,
+            bsdName: active.bsdName,
+            fileSystem: active.fileSystem,
+            durationMinutes: Int(active.expiresAt.timeIntervalSince(active.startedAt) / 60),
+            expiresAt: active.expiresAt,
+            cameraMediaStructureDetected: active.cameraMediaStructureDetected ?? false,
             requestedBy: active.requestedBy,
             requestingUID: active.requestingUID,
             note: active.note,
@@ -232,7 +239,7 @@ enum ExceptionManagerError: LocalizedError {
         case .helperNotRoot: "The privileged helper is not running as root."
         case .exceptionAlreadyActive(let name): "An exception is already active for \(name)."
         case .invalidDuration: "The requested duration is not permitted."
-        case .invalidNote: "A reason between 1 and 500 characters is required."
+        case .invalidNote: "A reason between \(HelperConstants.minimumReasonLength) and 500 characters is required."
         case .volumeChanged: "The selected volume is disconnected or its stable identity changed."
         case .requestMismatch: "The exception request identifier does not match the active exception."
         }

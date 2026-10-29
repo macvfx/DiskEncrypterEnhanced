@@ -42,8 +42,12 @@ final class AccessModel: ObservableObject {
     var validationMessage: String? {
         if selectedVolume == nil { return "Select one external volume." }
         if selectedVolume?.volumeUUID == nil { return "This volume has no stable UUID and cannot be safely excepted." }
-        if note.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty { return "A reason is required for the audit record." }
-        if note.count > 500 { return "Keep the reason to 500 characters or fewer." }
+        let cleanedNote = note.trimmingCharacters(in: .whitespacesAndNewlines)
+        if cleanedNote.isEmpty { return "A reason is required for the audit record." }
+        if cleanedNote.count < HelperConstants.minimumReasonLength {
+            return "Enter at least \(HelperConstants.minimumReasonLength) characters for the reason."
+        }
+        if cleanedNote.count > 500 { return "Keep the reason to 500 characters or fewer." }
         if !currentUserIsAdmin { return "Only an administrator can request an exception." }
         if activeException != nil { return "End the current exception before requesting another one." }
         if helperStatus != .ready { return "Privileged helper approval is required before disk access can change." }

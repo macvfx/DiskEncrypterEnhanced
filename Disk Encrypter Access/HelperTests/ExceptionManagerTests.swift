@@ -2,6 +2,64 @@ import Foundation
 import XCTest
 
 final class ExceptionManagerTests: XCTestCase {
+    func testHelperRejectsCraftedShortReason() throws {
+        let root = FileManager.default.temporaryDirectory
+            .appendingPathComponent("ShortReasonTests-\(UUID().uuidString)", isDirectory: true)
+        defer { try? FileManager.default.removeItem(at: root) }
+        let paths = ExceptionStoragePaths(
+            stateURL: root.appendingPathComponent("state/active-exception.plist"),
+            auditURL: root.appendingPathComponent("logs/exceptions.jsonl")
+        )
+        let disk = FakeDiskController()
+        let manager = ExceptionManager(
+            store: ProtectedExceptionStore(paths: paths),
+            audit: ProtectedAuditLog(paths: paths),
+            disk: disk,
+            requireRoot: false
+        )
+        let requestData = try JSONSerialization.data(withJSONObject: [
+            "requestID": UUID().uuidString,
+            "volumeUUID": try XCTUnwrap(disk.volume.volumeUUID),
+            "bsdName": disk.volume.bsdName,
+            "volumeName": disk.volume.name,
+            "fileSystem": disk.volume.fileSystem,
+            "note": "short",
+            "durationMinutes": 5,
+        ])
+        let request = try JSONDecoder().decode(ExceptionRequest.self, from: requestData)
+        let rejected = expectation(description: "short reason rejected")
+
+        manager.begin(
+            request: request,
+            caller: AuthenticatedCaller(uid: 501, username: "example-admin")
+        ) { result in
+            switch result {
+            case .success:
+                XCTFail("The helper accepted a crafted short reason.")
+            case .failure(let error):
+                XCTAssertTrue(error.localizedDescription.contains("10"))
+            }
+            rejected.fulfill()
+        }
+
+        wait(for: [rejected], timeout: 2)
+        XCTAssertFalse(FileManager.default.fileExists(atPath: paths.auditURL.path))
+    }
+
+    func testCameraMediaDetectorChecksOnlyKnownRootDirectories() throws {
+        let root = FileManager.default.temporaryDirectory
+            .appendingPathComponent("CameraMediaDetectorTests-\(UUID().uuidString)", isDirectory: true)
+        defer { try? FileManager.default.removeItem(at: root) }
+        try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
+
+        XCTAssertFalse(CameraMediaDetector.detect(at: root.path))
+        try FileManager.default.createDirectory(
+            at: root.appendingPathComponent("DCIM", isDirectory: true),
+            withIntermediateDirectories: false
+        )
+        XCTAssertTrue(CameraMediaDetector.detect(at: root.path))
+    }
+
     func testDiskResolutionUsesDirectStableUUIDLookup() throws {
         let uuid = "11111111-2222-3333-4444-555555555555"
         let plist: [String: Any] = [
