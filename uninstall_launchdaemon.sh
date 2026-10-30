@@ -12,7 +12,10 @@ YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
 # Configuration
-PLIST_NAME="com.custom.diskencrypter.volumewatcher.plist"
+# The installer package installs com.custom.diskencrypter; install_launchdaemon.sh
+# installs com.custom.diskencrypter.volumewatcher. Remove whichever is present.
+LABELS=("com.custom.diskencrypter" "com.custom.diskencrypter.volumewatcher")
+PKG_ID="com.custom.diskencrypter"
 INSTALL_DIR="/Library/Application Support/Custom"
 LAUNCHDAEMON_DIR="/Library/LaunchDaemons"
 LOG_DIR="/var/log"
@@ -31,22 +34,37 @@ fi
 
 # Unload daemon
 echo -e "${YELLOW}Step 1/4: Unloading LaunchDaemon...${NC}"
-if launchctl list | grep -q "com.custom.diskencrypter.volumewatcher"; then
-    launchctl unload "$LAUNCHDAEMON_DIR/$PLIST_NAME" 2>/dev/null || true
-    sleep 1
-    echo -e "${GREEN}✓ LaunchDaemon unloaded${NC}"
-else
-    echo -e "${YELLOW}⚠ LaunchDaemon was not loaded${NC}"
-fi
+for label in "${LABELS[@]}"; do
+    if launchctl print "system/$label" &>/dev/null; then
+        launchctl bootout "system/$label" 2>/dev/null || true
+        sleep 1
+        echo -e "${GREEN}✓ Unloaded $label${NC}"
+    else
+        echo -e "${YELLOW}⚠ $label was not loaded${NC}"
+    fi
+    # Clear a leftover "launchctl disable" so a later reinstall loads normally
+    if launchctl print-disabled system 2>/dev/null | grep -Eq "\"$label\" => (disabled|true)"; then
+        launchctl enable "system/$label" 2>/dev/null || true
+        echo -e "${GREEN}✓ Cleared disabled flag for $label${NC}"
+    fi
+done
 echo ""
 
 # Remove plist
 echo -e "${YELLOW}Step 2/4: Removing LaunchDaemon plist...${NC}"
-if [[ -f "$LAUNCHDAEMON_DIR/$PLIST_NAME" ]]; then
-    rm "$LAUNCHDAEMON_DIR/$PLIST_NAME"
-    echo -e "${GREEN}✓ Removed $PLIST_NAME${NC}"
-else
-    echo -e "${YELLOW}⚠ Plist not found${NC}"
+for label in "${LABELS[@]}"; do
+    if [[ -f "$LAUNCHDAEMON_DIR/$label.plist" ]]; then
+        rm "$LAUNCHDAEMON_DIR/$label.plist"
+        echo -e "${GREEN}✓ Removed $label.plist${NC}"
+    else
+        echo -e "${YELLOW}⚠ $label.plist not found${NC}"
+    fi
+done
+
+# Forget the installer package receipt, if it was installed from the pkg
+if pkgutil --pkg-info "$PKG_ID" &>/dev/null; then
+    pkgutil --forget "$PKG_ID" >/dev/null
+    echo -e "${GREEN}✓ Removed package receipt $PKG_ID${NC}"
 fi
 echo ""
 
@@ -82,12 +100,23 @@ echo ""
 
 # Verify removal
 echo -e "${YELLOW}Verifying uninstallation...${NC}"
-if launchctl list | grep -q "com.custom.diskencrypter.volumewatcher"; then
-    echo -e "${RED}✗ LaunchDaemon still loaded (this shouldn't happen)${NC}"
-else
+still_loaded=0
+for label in "${LABELS[@]}"; do
+    if launchctl print "system/$label" &>/dev/null; then
+        echo -e "${RED}✗ $label still loaded (this shouldn't happen)${NC}"
+        still_loaded=1
+    fi
+done
+if [[ $still_loaded -eq 0 ]]; then
     echo -e "${GREEN}✓ LaunchDaemon successfully removed${NC}"
 fi
 echo ""
+
+if [[ -f "/Library/Managed Preferences/com.custom.diskencrypter.plist" ]]; then
+    echo "Note: settings were left in place (may be managed by MDM):"
+    echo "  /Library/Managed Preferences/com.custom.diskencrypter.plist"
+    echo ""
+fi
 
 echo -e "${GREEN}========================================${NC}"
 echo -e "${GREEN}Uninstallation Complete!${NC}"
