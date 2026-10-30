@@ -59,6 +59,17 @@ DiskEncryption2.0/
 
 The repository also includes [Disk Encrypter Access](Disk%20Encrypter%20Access/README.md), a SwiftUI administrator tool for one-volume, audited, time-limited writing exceptions. Its signed privileged-helper workflow is separate from the shell-only installation steps below.
 
+## Release tracks
+
+DiskEncrypter and Disk Encrypter Access share the protected exception-state contract, but they are versioned and released independently:
+
+| Component | Release tags | Current release | Purpose |
+|---|---|---|---|
+| DiskEncrypter installer | `2.4.6`, `2.4.7`, … | [`2.4.6`](https://github.com/macvfx/DiskEncrypterEnhanced/releases/tag/2.4.6) | Installs the enforcement script and LaunchDaemon. |
+| Disk Encrypter Access | `access-v0.1.0`, `access-v0.1.1`, … | `access-v0.1.0` | Optional signed macOS app for one audited, time-limited, UUID-specific write exception. |
+
+Install DiskEncrypter before using the Access app. The Access app does not replace or globally unload the enforcement daemon.
+
 ## Quick Start Installation
 
 There are two ways to install. They set up the same daemon under **different LaunchDaemon labels** — use one, not both:

@@ -18,6 +18,12 @@ Disk Encrypter Access is a small SwiftUI macOS administrator tool for granting o
 
 The existing DiskEncrypter scripts consult the protected state and skip enforcement only when the mounted volume UUID matches an unexpired `activating` or `active` exception.
 
+## Releases
+
+Disk Encrypter Access has its own release track inside the DiskEncrypter Enhanced repository. App tags use `access-v<version>` so they remain distinct from DiskEncrypter installer tags.
+
+The current app release is `access-v0.1.0` (build 8). Its DMG contains the optional app and bundled privileged helper; it does not install the main DiskEncrypter enforcement package. Install DiskEncrypter 2.4.6 or later first.
+
 ## Build and test
 
 Generate the Xcode project after editing `project.yml`:
@@ -46,6 +52,8 @@ The tests use fictional volume identities and a fake disk controller. They do no
 An ad-hoc or unsigned development build can compile and run the non-privileged interface, but it is not accepted as live helper-registration proof. Live acceptance must separately verify registration, administrator rejection/approval, XPC caller validation, one disposable external volume, expiry, busy-volume recovery, sleep/wake, reboot, and audit ownership/content.
 
 Use [Docs/TESTING.md](Docs/TESTING.md) for the two-Mac signed-build acceptance checklist, evidence requirements, and failure recovery procedure.
+
+Security issues involving helper authorization, protected audit storage, exception expiry, or disk mutation should be reported privately according to the repository [security policy](../SECURITY.md).
 
 ## Future SimpleMDM reporting
 
