@@ -1726,8 +1726,8 @@ Updated both package builders to use the correct regex:
 ```
 
 **Files Modified:**
-- `/Users/xavier/Downloads/2025 Claude Code/Force Encryption/v2.4.5/make_package.sh`
-- `/Users/xavier/Downloads/2025 Claude Code/Force Encryption/v2.4.5/make_package_NotSigned.sh`
+- `/Users/example/Projects/Force Encryption/v2.4.5/make_package.sh`
+- `/Users/example/Projects/Force Encryption/v2.4.5/make_package_NotSigned.sh`
 
 **Additional Improvements:**
 
